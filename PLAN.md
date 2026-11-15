@@ -1,6 +1,6 @@
 # Project plan
 
-Last updated: 2026-11-14
+Last updated: 2026-11-15
 
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
@@ -9,7 +9,7 @@ Current milestone: M0
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
-| M0 | Spike | todo | Scaffold; prove Translator API in extension and caption track access |
+| M0 | Spike | in progress | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | todo | Captions in, translate, overlay, player button |
 | M2 | Settings + cache | todo | Popup settings; per-video cache |
 | M3 | Polish | todo | SPA navigation, errors, model download progress |
@@ -36,7 +36,7 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 ## Milestones
 <!-- status: [ ] todo, [~] in progress, [x] done -->
 ### M0: Spike
-- [ ] Scaffold WXT + TypeScript + Vitest; lint/typecheck; fill AGENTS.md Commands/Structure.
+- [x] Scaffold WXT + TypeScript + Vitest; lint/typecheck; fill AGENTS.md Commands/Structure.
 - [ ] Prove `Translator` (en->ru) works from the extension (content script, else main world/offscreen).
 - [ ] Prove we can get the caption track of a `/watch` video (player's own response, else caption DOM).
 

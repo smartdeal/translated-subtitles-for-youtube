@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS, FONT_SCALE_MAX, sanitizeSettings } from '../utils/settings';
+import { DEFAULT_SETTINGS, FONT_SCALE_MAX, defaultTargetLanguage, sanitizeSettings } from '../utils/settings';
 
 describe('sanitizeSettings', () => {
   it('returns defaults for missing or broken values', () => {
@@ -15,5 +15,22 @@ describe('sanitizeSettings', () => {
       display: 'translation',
       fontScale: FONT_SCALE_MAX,
     });
+  });
+});
+
+describe('defaultTargetLanguage', () => {
+  it.each([
+    ['ru', 'ru'],
+    ['de-DE', 'de'],
+    ['en-US', 'en'],
+    ['zh-CN', 'zh'],
+    ['zh-TW', 'zh-Hant'],
+    ['zh-HK', 'zh-Hant'],
+    ['nb', 'no'],
+    ['pt-BR', 'pt'],
+    ['xx', 'en'],
+    ['', 'en'],
+  ])('%s -> %s', (ui, expected) => {
+    expect(defaultTargetLanguage(ui)).toBe(expected);
   });
 });

@@ -4,6 +4,7 @@
 // falls back to the response of the player's own caption request.
 import type { Json3 } from '../utils/captions';
 import { detectSpokenLanguage, normalizeLang, type PlayerLanguageData } from '../utils/language';
+import { ALL_PLAYERS_SELECTOR, pickPlayer } from '../utils/page';
 import { FROM_ISOLATED, FROM_MAIN, isFrom, type CaptionsResponse, type GetCaptionsRequest } from '../utils/messages';
 
 interface CaptionTrack {
@@ -56,9 +57,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** After SPA navigation the player may still hold the previous video for a moment. */
 async function playerResponseFor(videoId: string) {
   for (let i = 0; i < 25; i++) {
-    const player = document.querySelector<PlayerElement>('#movie_player');
-    const resp = player?.getPlayerResponse?.();
-    if (resp?.videoDetails?.videoId === videoId) return resp;
+    const players = document.querySelectorAll<PlayerElement>(ALL_PLAYERS_SELECTOR);
+    const player = pickPlayer(players, videoId, (p) => p.getPlayerResponse?.()?.videoDetails?.videoId);
+    if (player) return player.getPlayerResponse?.();
     await sleep(200);
   }
   return undefined;

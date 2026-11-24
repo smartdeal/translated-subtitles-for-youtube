@@ -9,11 +9,12 @@ M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-
 M5 Shorts: implementation (see PLAN.md M5).
 
 ## Next steps
-- `utils/page.ts` (page kind + video id + player selector), with tests.
-- Shorts caption fallback via `setOption('captions','track',...)` + intercept.
+- Shorts caption fallback via `setOption('captions','track',...)` + intercept (now shows "Could not load subtitles" on Shorts).
+- Then Shorts button, overlay placement, live-stream note.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: `utils/page.ts` (watch/shorts, 11-char video id, player selectors; MAIN world picks the player by video id). 35 unit tests. Checked in Chrome: TED en->ru on /watch; SPA to a Short with button on -> overlay on `#shorts-player`, expected fetch-failed text.
 - 2026-11-25: M5 spike done in Chrome (Shorts + embeds); embeds dropped from M5 (user pick), see Decisions.
 - 2026-11-25: M5 planned: Shorts + embeds (user pick). Live streams stay in Ideas.
 - 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
@@ -35,7 +36,7 @@ M5 Shorts: implementation (see PLAN.md M5).
 - Translate ahead from playback position + cache per video in `chrome.storage.local`: API is sequential; seek/rewatch stay instant.
 - TypeScript 5.9 (not 7.x): WXT peer range is >=5.4; TS 7 native compiler untested with WXT tooling.
 - Translator runs in the isolated content script: works there; first `create()` needs the click gesture (model download ~8.5 s once), later calls need none. ~40 ms per line sequential, ~13 s for a 315-line talk.
-- Caption source: MAIN-world script reads `captionTracks` from `#movie_player.getPlayerResponse()` and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
+- Caption source: MAIN-world script reads `captionTracks` from `getPlayerResponse()` of the player holding the requested video (`utils/page.ts`) and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
 - Cache = map original line -> translation per video+language pair (survives line-split changes); saved at most every 5 s and on stop.
 - Language change in popup turns the button off: a new pair may need a model download, which needs a click.
 - Spoken language = original (non-`isAutoDubbed`) audio track from `streamingData.adaptiveFormats[].audioTrack`, else single non-dub ASR track. Not `player.getAudioTrack()`: minified field names. ASR alone is unreliable (dub ASR tracks, wrong guesses like `uk` for Russian audio).

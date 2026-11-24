@@ -5,7 +5,7 @@ Last updated: 2026-11-25
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M5 Shorts + embeds (planned)
+Current milestone: M5 Shorts (spike done)
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
@@ -14,7 +14,7 @@ Current milestone: M5 Shorts + embeds (planned)
 | M2 | Settings + cache | done | Popup settings; per-video cache |
 | M3 | Polish | done | SPA navigation, errors, model download progress |
 | M4 | Auto language | done | From = Auto (video's spoken language); skip videos already in target language |
-| M5 | Shorts + embeds | planned | Same subtitles on `/shorts/` and on embedded players (`/embed/`, youtube-nocookie) |
+| M5 | Shorts | in progress | Same subtitles on `/shorts/` |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -24,8 +24,8 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 
 ## Scope
 - In: `youtube.com/watch`; existing YouTube captions (incl. auto-generated); Chrome built-in Translator API; dual-line or translation-only display; player-bar toggle; popup settings (target language, display mode, font size); per-video cache.
-- In (M5): `youtube.com/shorts/`; embedded players (`youtube.com/embed/`, `youtube-nocookie.com/embed/`).
-- Out (not now): speech-to-text, other engines, live streams, Web Store release, mobile.
+- In (M5): `youtube.com/shorts/`.
+- Out (not now): speech-to-text, other engines, live streams, embedded players, Web Store release, mobile.
 
 ## Architecture
 - Content script on `youtube.com/watch`:
@@ -76,16 +76,14 @@ Retro: TBD
 
 Retro: TBD
 
-### M5: Shorts + embeds
-- [ ] Spike in Chrome, results to STATE "Decisions" (no product code):
-  - Shorts: player element (`#shorts-player`?), `getPlayerResponse()` and `captionTracks` present, which event fires on swipe (`yt-navigate-finish`?), where a button fits (no `.ytp-subtitles-button`), overlay position over the Shorts UI.
-  - Embeds: content scripts in a cross-origin iframe (`all_frames`); Translator API there (Permissions-Policy `translator` is `self` by default, may be blocked on third-party sites); how a video change inside an embed (playlist, end screen) shows up without `yt-navigate-*`.
-- [ ] `utils/page.ts`: page kind (`watch` | `shorts` | `embed`) and video id from URL, player selector per kind; one module for these selectors. Unit tests. `youtube.content.ts` and MAIN world use it instead of `#movie_player` / `/watch`.
-- [ ] Shorts: button and overlay placement, session restart on swipe, native captions hidden.
-- [ ] Embeds: manifest matches for `/embed/*` on both hosts + `all_frames`; restart on video change inside the embed. Host permission change recorded in STATE "Decisions".
-- [ ] Translator API blocked in an embed: clear status text, no silent failure (test for the text).
+### M5: Shorts
+- [x] Spike in Chrome (results in STATE "Decisions"). Embeds dropped from M5: Translator API is blocked there.
+- [ ] `utils/page.ts`: page kind (`watch` | `shorts`), video id from URL, player selector per kind (`#movie_player` / `#shorts-player`; on Shorts a hidden 0x0 `#movie_player` also exists). Unit tests. `youtube.content.ts` and the MAIN world use it.
+- [ ] Captions on Shorts: direct json3 fetch returns an empty body; if empty, call `player.setOption('captions','track',{languageCode})` so the player sends its own request (with `pot`), take the intercepted copy, then restore the user's CC state. Test for the empty-body path.
+- [ ] Shorts button: before `#closed-captioning-button-container` in the active `ytd-shorts-player-controls #right-controls`; own style to match the 48 px round buttons.
+- [ ] Shorts overlay: inside `#shorts-player`, clear of the bottom title/channel overlay; native captions hidden. Restart on swipe (`yt-navigate-finish`, same `<video>` reused).
 - [ ] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
-- [ ] Check in Chrome: a Short with captions (swipe to next), an embed on a third-party page, a youtube-nocookie embed; `/watch` still works.
+- [ ] Check in Chrome: a Short with captions, swipe to next and back, a Short without captions; `/watch` still works.
 
 Retro: TBD
 
@@ -93,17 +91,18 @@ Retro: TBD
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).
 - YouTube SPA and DOM changes break selectors.
 - Sequential translation is slow on long tracks.
-- Embeds: Translator API may be blocked in cross-origin iframes by Permissions-Policy; a workaround (offscreen document) costs an extra permission.
 - Shorts UI changes more often than the watch page; selectors there are fragile.
 
 ## Ideas / later
 - Speech-to-text for videos without captions.
 - DeepL / LLM translation engines.
 - Live streams (captions are a moving window, not a full track).
+- Embedded players (`/embed/`, youtube-nocookie): Translator API blocked by Permissions-Policy in normal embeds (2026-11-25 spike). Possible route: translate in an extension offscreen document (`offscreen` permission); untested whether Translator works there and whether a model download can start without a page gesture.
 - Chrome Web Store release.
 
 ## Plan changes
 <!-- newest first, one line each: YYYY-MM-DD: what changed; why. Keep ~20, move older to docs/plan/changes-archive.md -->
+- 2026-11-25: M5 cut to Shorts; spike showed Translator API blocked in normal embeds (Permissions-Policy, content scripts do not bypass). Embeds back to Ideas with the offscreen idea.
 - 2026-11-25: M5 Shorts + embeds picked from Ideas; same caption pipeline, medium size. Live streams stay in Ideas (different caption model).
 - 2026-11-24: M4 added (auto source language, skip same-language videos); user saw a Russian video translated en->ru from YouTube's auto-dub English track.
 - 2026-11-24: SPA navigation moved from M3 into M1; without it old subtitles stayed on the next video.

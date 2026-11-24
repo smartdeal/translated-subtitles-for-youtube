@@ -3,17 +3,18 @@
 Last updated: 2026-11-25
 
 ## Status
-M0-M4 done and merged into `master`. M5 (Shorts + embeds) planned on `feat/m5-shorts-embeds`.
+M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-embeds`; spike done.
 
 ## Current focus
-M5 Shorts + embeds: spike first (see PLAN.md M5).
+M5 Shorts: implementation (see PLAN.md M5).
 
 ## Next steps
-- M5 spike in Chrome: Shorts player/captions/swipe event/button spot; embeds: content script in iframe, Translator API under Permissions-Policy, video change inside embed.
-- Then `utils/page.ts` (page kind + video id + player selector), with tests.
+- `utils/page.ts` (page kind + video id + player selector), with tests.
+- Shorts caption fallback via `setOption('captions','track',...)` + intercept.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: M5 spike done in Chrome (Shorts + embeds); embeds dropped from M5 (user pick), see Decisions.
 - 2026-11-25: M5 planned: Shorts + embeds (user pick). Live streams stay in Ideas.
 - 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
 - 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
@@ -39,7 +40,10 @@ M5 Shorts + embeds: spike first (see PLAN.md M5).
 - Language change in popup turns the button off: a new pair may need a model download, which needs a click.
 - Spoken language = original (non-`isAutoDubbed`) audio track from `streamingData.adaptiveFormats[].audioTrack`, else single non-dub ASR track. Not `player.getAudioTrack()`: minified field names. ASR alone is unreliable (dub ASR tracks, wrong guesses like `uk` for Russian audio).
 - "Already in target language" is checked even with a fixed From: translating YouTube's machine English back to the spoken language is useless.
-- MVP covers `youtube.com/watch` only: Shorts/live handle captions differently.
+- MVP covers `youtube.com/watch` only: Shorts/live handle captions differently. M5 adds Shorts.
+- Shorts (spike 2026-11-25): player is `#shorts-player` (getPlayerResponse + captionTracks work); a hidden 0x0 `#movie_player` is also on the page, so never pick the player by `#movie_player` alone. Swipe fires `yt-navigate-start/finish`; the same `<video>` element is reused. CC button lives in `ytd-shorts-player-controls #right-controls` (`#closed-captioning-button-container`), outside the player element.
+- Shorts captions: direct `baseUrl&fmt=json3` returns 200 with an empty body (also with `&c=WEB`); the player's own XHR has `pot` and works. `player.setOption('captions','track',{languageCode})` makes the player send it, so the intercept fallback can be triggered on demand. Same video on `/watch`: direct fetch still works.
+- Embeds dropped (spike 2026-11-25): YouTube's default embed `allow` list has no `translator`; inside such iframes the content script gets `availability() = 'unavailable'` and `create()` throws NotAllowedError (Permissions-Policy). Works only with `allow="translator"`. Embed player has no player response until play; after play `loadeddata` + getPlayerResponse give tracks.
 
 ## Open questions / blockers
 - Direct caption fetch tested only on a logged-in Premium account; may need `pot` when logged out. Fallback (XHR intercept) is ready.

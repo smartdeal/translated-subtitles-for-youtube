@@ -14,7 +14,8 @@ export type GetTranslator = (from: string, to: string, onProgress: (f: number) =
 
 export const isGestureError = (e: unknown) => e instanceof DOMException && e.name === 'NotAllowedError';
 
-const CAPTIONS_TIMEOUT_MS = 10_000;
+// MAIN world may wait up to 5 s for the player and 5 s for the Shorts fallback.
+const CAPTIONS_TIMEOUT_MS = 15_000;
 const ERROR_SHOW_MS = 8000;
 const FAILS_BEFORE_WARNING = 3;
 

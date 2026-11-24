@@ -9,11 +9,12 @@ M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-
 M5 Shorts: implementation (see PLAN.md M5).
 
 ## Next steps
-- Shorts caption fallback via `setOption('captions','track',...)` + intercept (now shows "Could not load subtitles" on Shorts).
-- Then Shorts button, overlay placement, live-stream note.
+- Shorts button (before `#closed-captioning-button-container`); today the button exists only on /watch, so Shorts work only after turning it on there.
+- Then Shorts overlay placement (native CC hidden on `#shorts-player`), live-stream note.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: Shorts captions: `utils/caption-fetch.ts` loadTrackJson (direct fetch -> intercepted copy -> ask player via setOption, wait <=5 s, restore user's CC track). Isolated caption timeout 10 -> 15 s. 43 unit tests. Checked in Chrome: /watch still direct fetch only; English Short en->ru in 3.4 s via player XHR with `pot`, CC back off; Russian Short with en dub -> "already in Russian".
 - 2026-11-25: `utils/page.ts` (watch/shorts, 11-char video id, player selectors; MAIN world picks the player by video id). 35 unit tests. Checked in Chrome: TED en->ru on /watch; SPA to a Short with button on -> overlay on `#shorts-player`, expected fetch-failed text.
 - 2026-11-25: M5 spike done in Chrome (Shorts + embeds); embeds dropped from M5 (user pick), see Decisions.
 - 2026-11-25: M5 planned: Shorts + embeds (user pick). Live streams stay in Ideas.
@@ -23,11 +24,6 @@ M5 Shorts: implementation (see PLAN.md M5).
 - 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 - 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
 - 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
-- 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
-- 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
-- 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.
-- 2026-11-15: WXT 0.21.5 + TS 5.9.3 + Vitest 5.1.0 scaffold; spike scripts (isolated + MAIN world) build.
-- 2026-11-14: project files created after kickoff grilling.
 
 ## Decisions
 <!-- decision: reason -->
@@ -36,7 +32,7 @@ M5 Shorts: implementation (see PLAN.md M5).
 - Translate ahead from playback position + cache per video in `chrome.storage.local`: API is sequential; seek/rewatch stay instant.
 - TypeScript 5.9 (not 7.x): WXT peer range is >=5.4; TS 7 native compiler untested with WXT tooling.
 - Translator runs in the isolated content script: works there; first `create()` needs the click gesture (model download ~8.5 s once), later calls need none. ~40 ms per line sequential, ~13 s for a 315-line talk.
-- Caption source: MAIN-world script reads `captionTracks` from `getPlayerResponse()` of the player holding the requested video (`utils/page.ts`) and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
+- Caption source: MAIN-world script reads `captionTracks` from `getPlayerResponse()` of the player holding the requested video (`utils/page.ts`) and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR; if none yet (Shorts), turn the track on with `setOption('captions','track',...)`, take the copy, restore the user's CC track (`utils/caption-fetch.ts`). Pass cues to isolated world via `window.postMessage`.
 - Cache = map original line -> translation per video+language pair (survives line-split changes); saved at most every 5 s and on stop.
 - Language change in popup turns the button off: a new pair may need a model download, which needs a click.
 - Spoken language = original (non-`isAutoDubbed`) audio track from `streamingData.adaptiveFormats[].audioTrack`, else single non-dub ASR track. Not `player.getAudioTrack()`: minified field names. ASR alone is unreliable (dub ASR tracks, wrong guesses like `uk` for Russian audio).

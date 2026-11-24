@@ -6,7 +6,13 @@ import { cacheKey, type TranslationCache } from './cache';
 import type { Settings } from './settings';
 import { TranslationQueue } from './translation-queue';
 import type { TextTranslator } from './translator';
-import { captionsErrorText, TRANSLATION_FAILING } from './status-text';
+import { sameLanguage } from './language';
+import { alreadyInText, captionsErrorText, downloadText, TRANSLATION_FAILING } from './status-text';
+
+/** Returns a translator for a pair. Rejects with a NotAllowedError when a model download needs a click. */
+export type GetTranslator = (from: string, to: string, onProgress: (f: number) => void) => Promise<TextTranslator>;
+
+export const isGestureError = (e: unknown) => e instanceof DOMException && e.name === 'NotAllowedError';
 
 const CAPTIONS_TIMEOUT_MS = 10_000;
 const ERROR_SHOW_MS = 8000;
@@ -49,9 +55,11 @@ export class Session {
   constructor(
     private readonly player: HTMLElement,
     private readonly video: HTMLVideoElement,
-    private readonly translator: TextTranslator,
+    private readonly getTranslator: GetTranslator,
     private settings: Settings,
     private readonly cache?: TranslationCache,
+    /** Called when a new model download needs a click; the caller turns the button off. */
+    private readonly onNeedsClick: (from: string, to: string) => void = () => {},
   ) {
     this.overlay = new Overlay(player);
     this.overlay.setScale(settings.fontScale);
@@ -72,19 +80,37 @@ export class Session {
       this.showError(captionsErrorText(res.reason, this.settings.sourceLanguage, res.available));
       return;
     }
+    const target = this.settings.targetLanguage;
+    if (sameLanguage(res.spokenLanguage ?? res.sourceLanguage, target)) {
+      this.showError(alreadyInText(target));
+      return;
+    }
     const cues = parseJson3(res.json);
     this.cues = res.kind === 'asr' ? mergeFragments(cues) : cues;
     if (!this.cues.length) {
       this.showError(captionsErrorText('no-track', this.settings.sourceLanguage, []));
       return;
     }
-    this.cacheKey = cacheKey(videoId, this.settings.sourceLanguage, this.settings.targetLanguage);
+    let translator: TextTranslator;
+    try {
+      translator = await this.getTranslator(res.sourceLanguage, target, (f) => this.overlay.setStatus(downloadText(f)));
+    } catch (err) {
+      if (this.stopped) return;
+      if (isGestureError(err)) {
+        this.onNeedsClick(res.sourceLanguage, target);
+        return;
+      }
+      this.showError(err instanceof Error ? err.message : 'Translator failed to start.');
+      return;
+    }
+    if (this.stopped) return;
+    this.cacheKey = cacheKey(videoId, res.sourceLanguage, target);
     const known = (await this.cache?.load(this.cacheKey).catch(() => ({}))) ?? {};
     if (this.stopped) return;
     this.overlay.setStatus('');
     this.queue = new TranslationQueue(
       this.cues,
-      this.translator,
+      translator,
       () => {
         this.shown = ''; // force a redraw when a translation arrives
         this.failStreak = 0;
@@ -116,7 +142,7 @@ export class Session {
   };
 
   /** Show an error for a while, then hide it (the button stays on for the next video). */
-  private showError(text: string): void {
+  showError(text: string): void {
     this.overlay.setStatus(text);
     clearTimeout(this.statusTimer);
     this.statusTimer = window.setTimeout(() => this.overlay.setStatus(''), ERROR_SHOW_MS);

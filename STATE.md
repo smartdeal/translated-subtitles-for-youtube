@@ -3,16 +3,18 @@
 Last updated: 2026-11-24
 
 ## Status
-All planned milestones (M0-M3) done; M3 on `feat/m3-polish`, not merged. Daily use + pick next ideas.
+M4 (auto language) code on `feat/m4-auto-language` (branched from unmerged `feat/m3-polish`); browser check pending.
 
 ## Current focus
-Use it daily; collect issues. Pick the next item from PLAN.md "Ideas / later".
+M4: From = Auto (video's spoken language); skip videos already in the target language.
 
 ## Next steps
-- Choose next idea (e.g. DeepL/LLM engine, Shorts/live, Web Store release) and add it as M4 in PLAN.md.
+- Browser check of M4 (Russian video -> "already in Russian"; English video -> en->ru with Auto; new pair needs click).
+- Then merge M3 + M4 (ask user).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
 - 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 - 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
 - 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
@@ -33,6 +35,8 @@ Use it daily; collect issues. Pick the next item from PLAN.md "Ideas / later".
 - Caption source: MAIN-world script reads `captionTracks` from `#movie_player.getPlayerResponse()` and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
 - Cache = map original line -> translation per video+language pair (survives line-split changes); saved at most every 5 s and on stop.
 - Language change in popup turns the button off: a new pair may need a model download, which needs a click.
+- Spoken language = original (non-`isAutoDubbed`) audio track from `streamingData.adaptiveFormats[].audioTrack`, else single non-dub ASR track. Not `player.getAudioTrack()`: minified field names. ASR alone is unreliable (dub ASR tracks, wrong guesses like `uk` for Russian audio).
+- "Already in target language" is checked even with a fixed From: translating YouTube's machine English back to the spoken language is useless.
 - MVP covers `youtube.com/watch` only: Shorts/live handle captions differently.
 
 ## Open questions / blockers

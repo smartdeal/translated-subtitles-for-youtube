@@ -3,7 +3,10 @@ import { storage } from 'wxt/utils/storage';
 
 export type DisplayMode = 'dual' | 'translation';
 
+export const AUTO = 'auto';
+
 export interface Settings {
+  /** A language code, or AUTO for the video's spoken language. */
   sourceLanguage: string;
   targetLanguage: string;
   display: DisplayMode;
@@ -11,7 +14,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  sourceLanguage: 'en',
+  sourceLanguage: AUTO,
   targetLanguage: 'ru',
   display: 'dual',
   fontScale: 1,
@@ -35,7 +38,7 @@ export function sanitizeSettings(raw: unknown): Settings {
   const lang = (v: unknown, d: string) => (typeof v === 'string' && LANG_RE.test(v) ? v : d);
   const scale = typeof r.fontScale === 'number' && Number.isFinite(r.fontScale) ? r.fontScale : DEFAULT_SETTINGS.fontScale;
   return {
-    sourceLanguage: lang(r.sourceLanguage, DEFAULT_SETTINGS.sourceLanguage),
+    sourceLanguage: r.sourceLanguage === AUTO ? AUTO : lang(r.sourceLanguage, DEFAULT_SETTINGS.sourceLanguage),
     targetLanguage: lang(r.targetLanguage, DEFAULT_SETTINGS.targetLanguage),
     display: r.display === 'translation' ? 'translation' : 'dual',
     fontScale: Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, scale)),

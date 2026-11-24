@@ -15,10 +15,11 @@ function icon(): SVGSVGElement {
     svgEl('path', {
       fill: 'currentColor',
       'fill-rule': 'evenodd',
-      d: 'M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5Z',
+      // 22x18 frame, same footprint as YouTube's CC icon.
+      d: 'M4 3h16a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4Z',
     }),
-    svgEl('rect', { x: '6', y: '9.5', width: '8', height: '1.8', rx: '0.9', fill: 'currentColor', opacity: '0.55' }),
-    svgEl('rect', { x: '6', y: '13', width: '12', height: '2', rx: '1', fill: 'currentColor' }),
+    svgEl('rect', { x: '5', y: '9.5', width: '9', height: '2', rx: '1', fill: 'currentColor', opacity: '0.55' }),
+    svgEl('rect', { x: '5', y: '13.5', width: '14', height: '2', rx: '1', fill: 'currentColor' }),
   );
   return svg;
 }

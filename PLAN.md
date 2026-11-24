@@ -5,13 +5,13 @@ Last updated: 2026-11-24
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M2
+Current milestone: M3
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
 | M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | done | Captions in, translate, overlay, player button |
-| M2 | Settings + cache | todo | Popup settings; per-video cache |
+| M2 | Settings + cache | done | Popup settings; per-video cache |
 | M3 | Polish | todo | SPA navigation, errors, model download progress |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
@@ -52,8 +52,10 @@ Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to A
 Retro: `git rm` of the last file in a dir deletes the dir; re-create before writing. Default branch is `master`.
 
 ### M2: Settings + cache
-- [ ] Popup: target language, display mode (dual / translation only), font size.
-- [ ] Per-video cache in `chrome.storage.local`.
+- [x] Popup: target language, display mode (dual / translation only), font size.
+- [x] Per-video cache in `chrome.storage.local`.
+
+Retro: extension popup and chrome:// pages are not reachable by browser automation; popup checks are manual.
 
 ### M3: Polish
 - [x] Handle YouTube SPA navigation between videos (restart on `yt-navigate-finish`, done in M1).

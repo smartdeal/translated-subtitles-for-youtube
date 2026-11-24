@@ -1,0 +1,11 @@
+:root { color-scheme: light dark; --fg: #1f1f1f; --bg: #fff; --muted: #666; }
+@media (prefers-color-scheme: dark) { :root { --fg: #eee; --bg: #202124; --muted: #aaa; } }
+body { margin: 0; padding: 12px 16px; width: 260px; font: 13px system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+h1 { font-size: 15px; margin: 0 0 12px; }
+form { display: grid; gap: 10px; }
+label { display: grid; gap: 4px; }
+label.row { display: flex; gap: 6px; align-items: center; }
+select, input[type="range"] { width: 100%; font: inherit; }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 4px; }
+legend { padding: 0; margin-bottom: 4px; }
+.hint { color: var(--muted); margin: 10px 0 0; }

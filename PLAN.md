@@ -95,9 +95,9 @@ Name "Translated Subtitles for YouTube", Unlisted, English listing only, privacy
 - [x] Icons 16/32/48/128 from the player-button glyph (`public/icon/`); 128 = 96 px art + 16 px padding.
 - [x] Default target language = browser UI language (was `ru`; wrong for a public listing).
 - [x] `README.md` + `PRIVACY.md` (no data collected; settings/cache in `chrome.storage`; captions translated on device).
-- [~] Store kit in `docs/store/`: listing text, single purpose, permission justifications, data-use answers, small promo tile 440x280 done; screenshots 1280x800 todo (with the zip check).
+- [x] Store kit in `docs/store/`: listing text, single purpose, permission justifications, data-use answers, small promo tile 440x280, screenshots 1280x800 (watch + Shorts).
 - [ ] GitHub repo + Pages for the privacy policy URL (user OK before push).
-- [ ] `npm run zip`; load the zip contents unpacked in Chrome and re-check golden path.
+- [x] `npm run zip`; load the zip contents unpacked in Chrome and re-check golden path.
 - [ ] Upload (user: developer account, $5 fee, 2-step verification), fill dashboard from `docs/store/`, submit as Unlisted.
 
 ## Risks / unknowns

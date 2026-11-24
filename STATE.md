@@ -9,9 +9,10 @@ M0-M5 done and merged into `master`. M6 (Web Store release) in progress on `feat
 M6: prepare and submit the Web Store release.
 
 ## Next steps
-- M6 tasks in PLAN.md: manifest, icons, README/PRIVACY, store kit, GitHub Pages, zip check, upload.
+- M6: GitHub repo + Pages (needs user OK to push), zip check in Chrome + screenshots 1280x800, upload by user.
 
 ## Recent changes
+- 2026-11-25: M6 prep: manifest name/description/`minimum_chrome_version` 138, version 1.0.0, icons (`docs/store/src/*.svg` -> `public/icon/`, rendered with `rsvg-convert`), README, PRIVACY, store kit `docs/store/listing.md`, promo tile. Default target language = browser UI language (`defaultTargetLanguage`), 61 tests. Zip: `.output/translation-plugin-1.0.0-chrome.zip`, 10 files, 24 kB. Not yet checked in Chrome.
 <!-- newest first, keep ~10 -->
 - 2026-11-25: M5 done. Live streams: `chooseTrack(..., isLive)` -> 'live' -> "Live streams are not supported yet." 51 unit tests. Final check on the real build: CNN live -> live text; TED /watch translates, overlay centered, 80% width; SPA to Shorts with button on: no-subtitles x2, en->ru in 2.8 s, "already in Russian", silent Short shows nothing until speech at 29 s (correct); one button, stays on through swipes, native CC hidden.
 - 2026-11-25: Shorts overlay: `bottom:22%` (title panel covers ~87-97% in narrow layout), smaller font limits, native CC hidden on any `.tp-active` player. Fixed centering: `left:50%`+`translateX(-50%)` capped the box at half the player width and wrapped short lines; now `left:0;right:0;margin:auto`. Checked in Chrome with the rules injected live (wide + 700 px window); real build not yet reloaded.

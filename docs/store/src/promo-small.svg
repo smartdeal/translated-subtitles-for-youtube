@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 280" width="440" height="280">
+  <rect width="440" height="280" fill="#1f1f1f"/>
+  <image x="32" y="40" width="72" height="72" href="icon.svg"/>
+  <text x="124" y="70" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700" fill="#fff">Translated Subtitles</text>
+  <text x="124" y="100" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#bbb">for YouTube</text>
+  <rect x="32" y="152" width="376" height="92" rx="8" fill="#000" opacity="0.75"/>
+  <text x="220" y="188" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#bdbdbd">Let me show you how it works.</text>
+  <text x="220" y="224" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#fff">Давайте покажу, как это работает.</text>
+</svg>

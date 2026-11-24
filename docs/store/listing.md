@@ -40,7 +40,8 @@ Not affiliated with or endorsed by YouTube or Google.
 - Screenshots 1280x800: `screenshot-*.png` (1 to 5)
 - Small promo tile 440x280: `promo-small.png`
 
-**Homepage URL**: GitHub repo URL. **Support URL**: GitHub issues URL.
+**Homepage URL**: https://github.com/smartdeal/translated-subtitles-for-youtube
+**Support URL**: https://github.com/smartdeal/translated-subtitles-for-youtube/issues
 
 ## Privacy practices tab
 
@@ -65,7 +66,7 @@ Show translated subtitles for the YouTube video the user is watching.
 
 Certify all three statements (no sale, no unrelated use, no creditworthiness use).
 
-**Privacy policy URL**: GitHub Pages URL of `PRIVACY.md`.
+**Privacy policy URL**: https://smartdeal.github.io/translated-subtitles-for-youtube/PRIVACY.html
 
 ## Distribution
 - Visibility: Unlisted.

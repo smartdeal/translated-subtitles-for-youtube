@@ -62,7 +62,11 @@ Show translated subtitles for the YouTube video the user is watching.
 
 **Remote code**: No, I am not using remote code. (All JS is in the package; no eval, no external scripts.)
 
-**Data usage**: check no data types. Reason: subtitle text and video ids are processed only on the device and never transmitted by the extension; settings and cache stay in `chrome.storage`. Before submitting, re-read the dashboard's definition of "collect" next to the checkboxes; if it counts on-device handling, tick "Website content" only.
+**Data usage**: the User Data FAQ (https://developer.chrome.com/docs/webstore/program-policies/user-data-faq) requires disclosure even when data is handled only on the device, and lists "website content" as user data. Tick:
+- **Website content**: subtitle text of the video on the page (read, translated on device, cached).
+- **Web history**: the cache is keyed by video id, so it is a local record of videos the user translated. Ticking it is the safe side; under-disclosure is a rejection reason, over-disclosure is not.
+
+Leave all other types unticked (no personal info, auth, location, communications, user activity tracking, financial, health).
 
 Certify all three statements (no sale, no unrelated use, no creditworthiness use).
 

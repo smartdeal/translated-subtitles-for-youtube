@@ -1,6 +1,6 @@
 # Privacy Policy: Translated Subtitles for YouTube
 
-Last updated: 2026-11-25
+Last updated: 2026-11-25 (rev. 2)
 
 ## Summary
 The extension does not collect, send, sell or share any personal data. It has no servers, no analytics and no accounts.
@@ -14,7 +14,7 @@ Subtitles are translated on your device by Chrome's built-in Translator API. The
 
 ## What is stored
 - Settings (languages, display mode, font size) in `chrome.storage.sync`. If Chrome Sync is turned on, Chrome syncs them between your browsers through your Google account.
-- A cache of translated subtitle lines per video in `chrome.storage.local`, on your device only, so that rewatching is instant.
+- A cache of translated subtitle lines in `chrome.storage.local`, on your device only, so that rewatching is instant. The cache is keyed by YouTube video id, so it holds a list of the videos you translated. It is never sent anywhere.
 
 You can delete all stored data by removing the extension.
 

@@ -13,6 +13,7 @@ M6: prepare and submit the Web Store release.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: Data-use answers fixed per the Web Store User Data FAQ: on-device handling must be disclosed too. Tick Website content + Web history (cache keyed by video id); PRIVACY.md says the cache lists translated video ids.
 - 2026-11-25: Public repo created and pushed; GitHub Pages from `master` root; privacy policy live at https://smartdeal.github.io/translated-subtitles-for-youtube/PRIVACY.html (200).
 - 2026-11-25: 1.0.0 build checked in Chrome: TED /watch en->ru dual lines, Short en->ru with button in Shorts controls. Store screenshots `docs/store/screenshot-1.png` (watch, theater) and `-2.png` (Short), 1280x800, masthead hidden. Default-language change not seen in a fresh profile (unit tests only).
 - 2026-11-25: M6 prep: manifest name/description/`minimum_chrome_version` 138, version 1.0.0, icons (`docs/store/src/*.svg` -> `public/icon/`, rendered with `rsvg-convert`), README, PRIVACY, store kit `docs/store/listing.md`, promo tile. Default target language = browser UI language (`defaultTargetLanguage`), 61 tests. Zip: `.output/translation-plugin-1.0.0-chrome.zip`, 10 files, 24 kB. Not yet checked in Chrome.

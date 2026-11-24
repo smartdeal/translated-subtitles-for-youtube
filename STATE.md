@@ -3,13 +3,12 @@
 Last updated: 2026-11-25
 
 ## Status
-M0-M4 merged into `master`. M5 (Shorts) done on `feat/m5-shorts-embeds`, not merged yet (waits for user).
+M0-M5 done and merged into `master`.
 
 ## Current focus
-M5 done; merge to master after user OK, then M5 retro.
+M5 retro, then pick M6 from PLAN.md Ideas.
 
 ## Next steps
-- Merge `feat/m5-shorts-embeds` into `master` (ask first).
 - M5 retro (two questions), then pick M6 from PLAN.md Ideas.
 
 ## Recent changes

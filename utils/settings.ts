@@ -13,22 +13,30 @@ export interface Settings {
   fontScale: number; // 1 = default size
 }
 
-export const DEFAULT_SETTINGS: Settings = {
-  sourceLanguage: AUTO,
-  targetLanguage: 'ru',
-  display: 'dual',
-  fontScale: 1,
-};
-
-export const FONT_SCALE_MIN = 0.6;
-export const FONT_SCALE_MAX = 2;
-
 /** Languages offered in the popup (BCP 47). The Translator API decides what really works. */
 export const LANGUAGES = [
   'ar', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hi', 'hr', 'hu', 'id', 'it',
   'ja', 'ko', 'lt', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'ta', 'te', 'th', 'tr',
   'uk', 'vi', 'zh', 'zh-Hant',
 ] as const;
+
+/** Browser UI language -> closest entry of LANGUAGES, else 'en'. */
+export function defaultTargetLanguage(uiLanguage: string): string {
+  const [base = '', region = ''] = uiLanguage.split('-');
+  if (base === 'zh') return ['TW', 'HK', 'MO', 'Hant'].includes(region) ? 'zh-Hant' : 'zh';
+  if (base === 'nb' || base === 'nn') return 'no';
+  return (LANGUAGES as readonly string[]).includes(base) ? base : 'en';
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+  sourceLanguage: AUTO,
+  targetLanguage: defaultTargetLanguage(typeof navigator === 'undefined' ? '' : navigator.language),
+  display: 'dual',
+  fontScale: 1,
+};
+
+export const FONT_SCALE_MIN = 0.6;
+export const FONT_SCALE_MAX = 2;
 
 const LANG_RE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/;
 

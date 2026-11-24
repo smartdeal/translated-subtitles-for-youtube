@@ -10,8 +10,12 @@ const CSS = `
 .tp-overlay>div:empty{display:none}
 .ytp-autohide .tp-overlay{bottom:6%}
 #movie_player.tp-active .ytp-caption-window-container{display:none!important}
-.tp-button{font-weight:700;font-size:13px;color:#fff;opacity:.9;text-align:center;vertical-align:top}
-.tp-button[aria-pressed="true"]{color:#3ea6ff;opacity:1}
+.tp-button.ytp-button{display:inline-flex;align-items:center;justify-content:center;line-height:0;color:#fff;vertical-align:top}
+.tp-button svg{width:24px;height:24px;opacity:.85;transition:opacity .1s}
+.tp-button:hover svg,.tp-button[aria-pressed="true"] svg{opacity:1}
+.tp-badge{position:absolute;top:6px;right:5px;padding:1px 3px;border-radius:2px;font:700 9px/1 Roboto,Arial,sans-serif;
+  letter-spacing:.2px;color:#fff;background:#606060;pointer-events:none}
+.tp-button[aria-pressed="true"] .tp-badge{background:#e1002d}
 `;
 
 export class Overlay {

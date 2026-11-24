@@ -2,6 +2,7 @@
 import { TranslationCache } from '../utils/cache';
 import { localStore } from '../utils/cache-store';
 import { ensureStyle } from '../utils/overlay';
+import { badgeText, createPlayerButton, updatePlayerButton } from '../utils/player-button';
 import { Session, type GetTranslator } from '../utils/session';
 import { loadSettings, watchSettings, type Settings } from '../utils/settings';
 import { needsClickText } from '../utils/status-text';
@@ -36,7 +37,7 @@ function dropTranslators(): void {
 
 const videoIdFromUrl = () => (location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null);
 const button = () => document.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
-const buttonLabel = () => settings.targetLanguage.toUpperCase();
+const buttonLabel = () => `the ${badgeText(settings.targetLanguage)} subtitles button`;
 
 function playerParts() {
   const player = document.querySelector<HTMLElement>('#movie_player');
@@ -46,7 +47,8 @@ function playerParts() {
 
 function setEnabled(on: boolean): void {
   enabled = on;
-  button()?.setAttribute('aria-pressed', String(on));
+  const btn = button();
+  if (btn) updatePlayerButton(btn, settings.targetLanguage, on);
 }
 
 function stopSession(): void {
@@ -84,19 +86,14 @@ function onButtonClick(): void {
 function ensureButton(): void {
   const existing = button();
   if (existing) {
-    existing.textContent = buttonLabel();
+    updatePlayerButton(existing, settings.targetLanguage, enabled);
     return;
   }
   const anchor = document.querySelector('#movie_player .ytp-subtitles-button');
   if (!anchor?.parentElement) return;
   ensureStyle();
-  const btn = document.createElement('button');
-  btn.className = `ytp-button ${BUTTON_CLASS}`;
-  btn.title = 'Translated subtitles';
-  btn.setAttribute('aria-label', 'Translated subtitles');
-  btn.setAttribute('aria-pressed', String(enabled));
-  btn.textContent = buttonLabel();
-  btn.addEventListener('click', () => void onButtonClick());
+  const btn = createPlayerButton(BUTTON_CLASS, onButtonClick);
+  updatePlayerButton(btn, settings.targetLanguage, enabled);
   anchor.parentElement.insertBefore(btn, anchor);
 }
 

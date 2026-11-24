@@ -31,5 +31,4 @@ M1: MVP (caption source, translator, scheduler, overlay, player button).
 
 ## Open questions / blockers
 - Direct caption fetch tested only on a logged-in Premium account; may need `pot` when logged out. Fallback (XHR intercept) is ready.
-- ASR json3 tracks are word-level segments with `
-` events: need grouping into readable lines.
+- ASR json3 tracks are word-level segments with `"\n"` events: need grouping into readable lines.

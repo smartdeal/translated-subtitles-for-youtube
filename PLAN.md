@@ -49,7 +49,7 @@ Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to A
 - [x] Overlay synced to playback (dual-line).
 - [x] Player-bar toggle button.
 
-Retro: TBD
+Retro: `git rm` of the last file in a dir deletes the dir; re-create before writing. Default branch is `master`.
 
 ### M2: Settings + cache
 - [ ] Popup: target language, display mode (dual / translation only), font size.

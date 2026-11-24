@@ -3,7 +3,7 @@
 Last updated: 2026-11-24
 
 ## Status
-M0 spike done (both risks resolved); M1 MVP next.
+M1 MVP code written on `feat/m1-mvp`; unit tests pass; browser check pending.
 
 ## Current focus
 M1: MVP (caption source, translator, scheduler, overlay, player button).
@@ -15,6 +15,7 @@ M1: MVP (caption source, translator, scheduler, overlay, player button).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.
 - 2026-11-24: M0 spike results (Chrome 157, logged-in account): Translator en->ru works in isolated content script; direct json3 caption fetch works without `pot`; player's own caption XHR is interceptable in MAIN world.
 - 2026-11-15: WXT 0.21.5 + TS 5.9.3 + Vitest 5.1.0 scaffold; spike scripts (isolated + MAIN world) build.
 - 2026-11-14: project files created after kickoff grilling.

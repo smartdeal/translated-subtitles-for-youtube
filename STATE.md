@@ -6,10 +6,10 @@ Last updated: 2026-11-25
 M0-M5 done and merged into `master`.
 
 ## Current focus
-M5 retro, then pick M6 from PLAN.md Ideas.
+Daily use; pick M6 from PLAN.md Ideas.
 
 ## Next steps
-- M5 retro (two questions), then pick M6 from PLAN.md Ideas.
+- Pick M6 from PLAN.md Ideas (DeepL/LLM engine, embeds via offscreen, live streams, speech-to-text, Web Store).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->

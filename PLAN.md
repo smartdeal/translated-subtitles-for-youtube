@@ -85,7 +85,7 @@ Retro: TBD
 - [x] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
 - [x] Check in Chrome: a Short with captions, swipe to next and back, a Short without captions; `/watch` still works.
 
-Retro: TBD
+Retro: skipped (user).
 
 ## Risks / unknowns
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).

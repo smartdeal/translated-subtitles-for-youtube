@@ -3,17 +3,22 @@
 Last updated: 2026-11-24
 
 ## Status
-M2 done and checked on `feat/m2-settings-cache` (not merged); M3 next.
+M4 done and checked on `feat/m4-auto-language` (includes unmerged M3). Waiting for merge.
 
 ## Current focus
-M3: polish (error states, model download progress).
+Daily use; pick the next idea from PLAN.md "Ideas / later".
 
 ## Next steps
-- M3: error states (no captions, unsupported pair, API unavailable): see one in a real browser.
-- M3: model download progress indicator (basic status line exists; polish it).
+- Merge `feat/m4-auto-language` (contains M3) into `master` (ask user).
+- Choose next idea (DeepL/LLM engine, Shorts/live, Web Store release) as M5.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
+- 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
+- 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
+- 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
+- 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
 - 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
 - 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
 - 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
@@ -32,9 +37,11 @@ M3: polish (error states, model download progress).
 - Caption source: MAIN-world script reads `captionTracks` from `#movie_player.getPlayerResponse()` and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
 - Cache = map original line -> translation per video+language pair (survives line-split changes); saved at most every 5 s and on stop.
 - Language change in popup turns the button off: a new pair may need a model download, which needs a click.
+- Spoken language = original (non-`isAutoDubbed`) audio track from `streamingData.adaptiveFormats[].audioTrack`, else single non-dub ASR track. Not `player.getAudioTrack()`: minified field names. ASR alone is unreliable (dub ASR tracks, wrong guesses like `uk` for Russian audio).
+- "Already in target language" is checked even with a fixed From: translating YouTube's machine English back to the spoken language is useless.
 - MVP covers `youtube.com/watch` only: Shorts/live handle captions differently.
 
 ## Open questions / blockers
 - Direct caption fetch tested only on a logged-in Premium account; may need `pot` when logged out. Fallback (XHR intercept) is ready.
-- Error status for videos without English subtitles not yet seen in a real browser (code path only).
+- Not seen in a real browser: 'timeout', 'fetch-failed', 'translation keeps failing', API missing (all code paths, unit-tested texts only). New download text "(one time only)" not re-seen; download progress itself was seen by user in M2.
 - ASR json3 tracks are word-level segments with `"\n"` events: need grouping into readable lines.

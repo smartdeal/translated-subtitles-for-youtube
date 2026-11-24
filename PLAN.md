@@ -5,14 +5,15 @@ Last updated: 2026-11-24
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M3
+Current milestone: none (M0-M4 done; next from Ideas)
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
 | M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | done | Captions in, translate, overlay, player button |
 | M2 | Settings + cache | done | Popup settings; per-video cache |
-| M3 | Polish | todo | SPA navigation, errors, model download progress |
+| M3 | Polish | done | SPA navigation, errors, model download progress |
+| M4 | Auto language | done | From = Auto (video's spoken language); skip videos already in target language |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -59,8 +60,19 @@ Retro: extension popup and chrome:// pages are not reachable by browser automati
 
 ### M3: Polish
 - [x] Handle YouTube SPA navigation between videos (restart on `yt-navigate-finish`, done in M1).
-- [ ] Error states: no captions, unsupported language pair, API unavailable.
-- [ ] Model download progress indicator.
+- [x] Error states: no captions (lists available languages), unsupported/same pair, API unavailable, caption timeout, repeated translation failures.
+- [x] Model download progress indicator.
+
+Retro: TBD
+
+### M4: Auto language
+- [x] Detect spoken language: original (non-dubbed) audio track in `streamingData.adaptiveFormats[].audioTrack`, else single ASR track; else ask user to set From.
+- [x] Settings: `sourceLanguage: 'auto'` (new default); popup option "Auto (video language)".
+- [x] Translator per language pair, created on demand; new pair without a click -> ask for a click.
+- [x] Spoken language == To -> note "already in <language>", no translation.
+- [x] Player button: SVG icon + language badge (user found the text button ugly).
+
+Retro: TBD
 
 ## Risks / unknowns
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).
@@ -75,5 +87,6 @@ Retro: extension popup and chrome:// pages are not reachable by browser automati
 
 ## Plan changes
 <!-- newest first, one line each: YYYY-MM-DD: what changed; why. Keep ~20, move older to docs/plan/changes-archive.md -->
+- 2026-11-24: M4 added (auto source language, skip same-language videos); user saw a Russian video translated en->ru from YouTube's auto-dub English track.
 - 2026-11-24: SPA navigation moved from M3 into M1; without it old subtitles stayed on the next video.
 - 2026-11-14: plan created from kickoff grilling.

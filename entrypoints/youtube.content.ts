@@ -1,21 +1,43 @@
-// Isolated world: player-bar button, translator, settings, and the subtitle session.
+// Isolated world: player-bar button, translators, settings, and the subtitle session.
 import { TranslationCache } from '../utils/cache';
 import { localStore } from '../utils/cache-store';
-import { ensureStyle, Overlay } from '../utils/overlay';
-import { Session } from '../utils/session';
+import { ensureStyle } from '../utils/overlay';
+import { badgeText, createPlayerButton, updatePlayerButton } from '../utils/player-button';
+import { Session, type GetTranslator } from '../utils/session';
 import { loadSettings, watchSettings, type Settings } from '../utils/settings';
+import { needsClickText } from '../utils/status-text';
 import { createChromeTranslator, type TextTranslator } from '../utils/translator';
 
 const BUTTON_CLASS = 'tp-button';
+const NEEDS_CLICK_SHOW_MS = 8000;
 
 let enabled = false;
 let settings: Settings;
-let translator: TextTranslator | undefined;
 let session: Session | undefined;
 const cache = new TranslationCache(localStore);
 
+/** One translator per language pair; with From = Auto, videos can need different pairs. */
+const translators = new Map<string, Promise<TextTranslator>>();
+
+const getTranslator: GetTranslator = (from, to, onProgress) => {
+  const key = `${from}>${to}`;
+  let t = translators.get(key);
+  if (!t) {
+    t = createChromeTranslator(from, to, onProgress);
+    translators.set(key, t);
+    t.catch(() => translators.delete(key)); // retry next time (e.g. after a click)
+  }
+  return t;
+};
+
+function dropTranslators(): void {
+  for (const t of translators.values()) t.then((x) => x.destroy(), () => {});
+  translators.clear();
+}
+
 const videoIdFromUrl = () => (location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null);
 const button = () => document.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
+const buttonLabel = () => `the ${badgeText(settings.targetLanguage)} subtitles button`;
 
 function playerParts() {
   const player = document.querySelector<HTMLElement>('#movie_player');
@@ -25,7 +47,8 @@ function playerParts() {
 
 function setEnabled(on: boolean): void {
   enabled = on;
-  button()?.setAttribute('aria-pressed', String(on));
+  const btn = button();
+  if (btn) updatePlayerButton(btn, settings.targetLanguage, on);
 }
 
 function stopSession(): void {
@@ -33,58 +56,44 @@ function stopSession(): void {
   session = undefined;
 }
 
+/** A new model must be downloaded, and Chrome allows that only right after a click. */
+function onNeedsClick(from: string, to: string): void {
+  const s = session;
+  setEnabled(false);
+  s?.showError(needsClickText(from, to, buttonLabel()));
+  setTimeout(() => {
+    if (session === s && !enabled) stopSession();
+  }, NEEDS_CLICK_SHOW_MS);
+}
+
 async function startSession(): Promise<void> {
   stopSession();
   const videoId = videoIdFromUrl();
   const parts = playerParts();
-  if (!videoId || !parts || !translator) return;
-  session = new Session(parts.player, parts.video, translator, settings, cache);
+  if (!videoId || !parts) return;
+  session = new Session(parts.player, parts.video, getTranslator, settings, cache, onNeedsClick);
+  // When started from a click, the translator is created within Chrome's
+  // user-activation window, so a first model download is allowed.
   await session.start(videoId);
 }
 
-async function onButtonClick(): Promise<void> {
+function onButtonClick(): void {
   setEnabled(!enabled);
-  if (!enabled) {
-    stopSession();
-    return;
-  }
-  if (!translator) {
-    const parts = playerParts();
-    const status = parts ? new Overlay(parts.player) : undefined;
-    status?.setStatus('Preparing translator…');
-    try {
-      // Must run inside the click: the first create() needs a user gesture.
-      translator = await createChromeTranslator(settings.sourceLanguage, settings.targetLanguage, (f) =>
-        status?.setStatus(`Downloading translation model… ${Math.round(f * 100)}%`),
-      );
-    } catch (err) {
-      status?.setStatus(err instanceof Error ? err.message : 'Translator failed to start.');
-      setTimeout(() => status?.destroy(), 5000);
-      setEnabled(false);
-      return;
-    }
-    status?.destroy();
-    if (!enabled) return; // turned off while the model was downloading
-  }
-  await startSession();
+  if (enabled) void startSession();
+  else stopSession();
 }
 
 function ensureButton(): void {
   const existing = button();
   if (existing) {
-    existing.textContent = settings.targetLanguage.toUpperCase();
+    updatePlayerButton(existing, settings.targetLanguage, enabled);
     return;
   }
   const anchor = document.querySelector('#movie_player .ytp-subtitles-button');
   if (!anchor?.parentElement) return;
   ensureStyle();
-  const btn = document.createElement('button');
-  btn.className = `ytp-button ${BUTTON_CLASS}`;
-  btn.title = 'Translated subtitles';
-  btn.setAttribute('aria-label', 'Translated subtitles');
-  btn.setAttribute('aria-pressed', String(enabled));
-  btn.textContent = settings.targetLanguage.toUpperCase();
-  btn.addEventListener('click', () => void onButtonClick());
+  const btn = createPlayerButton(BUTTON_CLASS, onButtonClick);
+  updatePlayerButton(btn, settings.targetLanguage, enabled);
   anchor.parentElement.insertBefore(btn, anchor);
 }
 
@@ -97,11 +106,9 @@ function onSettingsChanged(next: Settings): void {
     session?.updateDisplay(next);
     return;
   }
-  // A new language pair may need a model download, which needs a click.
-  stopSession();
-  translator?.destroy();
-  translator = undefined;
-  setEnabled(false);
+  dropTranslators();
+  // Restart with the new pair. If it needs a model download, the session asks for a click.
+  if (enabled && videoIdFromUrl()) void startSession();
 }
 
 export default defineContentScript({
@@ -136,6 +143,7 @@ export default defineContentScript({
       document.removeEventListener('yt-navigate-start', onNavStart);
       document.removeEventListener('yt-navigate-finish', onNavFinish);
       stopSession();
+      dropTranslators();
       button()?.remove();
     });
   },

@@ -3,6 +3,7 @@
 // fetch fails (e.g. YouTube starts to require a proof-of-origin token),
 // falls back to the response of the player's own caption request.
 import type { Json3 } from '../utils/captions';
+import { detectSpokenLanguage, normalizeLang, type PlayerLanguageData } from '../utils/language';
 import { FROM_ISOLATED, FROM_MAIN, isFrom, type CaptionsResponse, type GetCaptionsRequest } from '../utils/messages';
 
 interface CaptionTrack {
@@ -12,6 +13,7 @@ interface CaptionTrack {
 }
 interface PlayerElement extends HTMLElement {
   getPlayerResponse?: () => {
+    streamingData?: PlayerLanguageData['streamingData'];
     videoDetails?: { videoId?: string };
     captions?: { playerCaptionsTracklistRenderer?: { captionTracks?: CaptionTrack[] } };
   };
@@ -25,14 +27,13 @@ function remember(url: string, body: string): void {
     const u = new URL(url, location.origin);
     const json = JSON.parse(body) as Json3;
     if (!Array.isArray(json.events)) return;
-    intercepted.set(`${u.searchParams.get('v')}|${baseLang(u.searchParams.get('lang') ?? '')}`, json);
+    intercepted.set(`${u.searchParams.get('v')}|${normalizeLang(u.searchParams.get('lang') ?? '')}`, json);
   } catch {
     /* not json3: ignore */
   }
 }
 
 const isTimedText = (url: string) => url.includes('/api/timedtext');
-const baseLang = (code: string) => code.split('-')[0]!.toLowerCase();
 
 function patchNetwork(): void {
   const origFetch = window.fetch;
@@ -68,25 +69,33 @@ async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
   const resp = await playerResponseFor(req.videoId);
   if (!resp) return { ...base, type: 'captions-error', reason: 'no-player' };
 
-  const tracks = (resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? []).filter(
-    (t) => baseLang(t.languageCode) === req.lang,
-  );
+  const all = resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
+  const spokenLanguage = detectSpokenLanguage(resp);
+  const lang = req.lang === 'auto' ? spokenLanguage : normalizeLang(req.lang);
+  if (!lang) {
+    const available = [...new Set(all.map((t) => t.languageCode))];
+    return { ...base, type: 'captions-error', reason: 'unknown-language', available };
+  }
+  const tracks = all.filter((t) => normalizeLang(t.languageCode) === lang);
   const track = tracks.find((t) => t.kind !== 'asr') ?? tracks.find((t) => t.kind === 'asr');
-  if (!track) return { ...base, type: 'captions-error', reason: 'no-track' };
-  const kind = track.kind === 'asr' ? 'asr' : 'manual';
+  if (!track) {
+    const available = [...new Set(all.map((t) => t.languageCode))];
+    return { ...base, type: 'captions-error', reason: 'no-track', available };
+  }
+  const ok = { ...base, type: 'captions', kind: track.kind === 'asr' ? 'asr' : 'manual', sourceLanguage: lang, spokenLanguage } as const;
 
   try {
     const res = await fetch(`${track.baseUrl}&fmt=json3`, { credentials: 'include' });
     const text = await res.text();
     if (res.ok && text) {
       const json = JSON.parse(text) as Json3;
-      if (Array.isArray(json.events)) return { ...base, type: 'captions', kind, json };
+      if (Array.isArray(json.events)) return { ...ok, json };
     }
   } catch {
     /* fall through to the intercepted copy */
   }
-  const json = intercepted.get(`${req.videoId}|${req.lang}`);
-  if (json) return { ...base, type: 'captions', kind, json };
+  const json = intercepted.get(`${req.videoId}|${lang}`);
+  if (json) return { ...ok, json };
   return { ...base, type: 'captions-error', reason: 'fetch-failed' };
 }
 

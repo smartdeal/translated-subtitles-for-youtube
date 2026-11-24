@@ -9,10 +9,12 @@ M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-
 M5 Shorts: implementation (see PLAN.md M5).
 
 ## Next steps
-- Shorts overlay placement (native CC hidden on `#shorts-player`, clear of the title overlay), live-stream note.
+- Live-stream note (`videoDetails.isLive`).
+- Final M5 check on the real build: Short with captions + swipe, Short without captions, /watch (also re-check overlay centering there).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: Shorts overlay: `bottom:22%` (title panel covers ~87-97% in narrow layout), smaller font limits, native CC hidden on any `.tp-active` player. Fixed centering: `left:50%`+`translateX(-50%)` capped the box at half the player width and wrapped short lines; now `left:0;right:0;margin:auto`. Checked in Chrome with the rules injected live (wide + 700 px window); real build not yet reloaded.
 - 2026-11-25: Fix: a video with no caption tracks (and unknown language) said "Could not tell which language"; now "This video has no subtitles." Track choice moved to `chooseTrack` in `utils/caption-fetch.ts`. 48 unit tests. Checked in Chrome on a Short without captions; built `pointer-events:auto` CSS confirmed (click does not pause).
 - 2026-11-25: Shorts button: one button moved to the CC button of the current page (`BUTTON_ANCHOR_SELECTOR` in `utils/page.ts`), `tp-shorts` style (48 px round). Shorts controls have `pointer-events:none`: button needs `pointer-events:auto` or clicks hit the video. Checked in Chrome: looks like the native controls; click translates without pausing; swipe -> button re-inserted, stays on, session restarts.
 - 2026-11-25: Shorts captions: `utils/caption-fetch.ts` loadTrackJson (direct fetch -> intercepted copy -> ask player via setOption, wait <=5 s, restore user's CC track). Isolated caption timeout 10 -> 15 s. 43 unit tests. Checked in Chrome: /watch still direct fetch only; English Short en->ru in 3.4 s via player XHR with `pot`, CC back off; Russian Short with en dub -> "already in Russian".
@@ -22,7 +24,6 @@ M5 Shorts: implementation (see PLAN.md M5).
 - 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
 - 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
 - 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
-- 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 
 ## Decisions
 <!-- decision: reason -->

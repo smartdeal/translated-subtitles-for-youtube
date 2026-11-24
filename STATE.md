@@ -1,18 +1,20 @@
 # Project state
 
-Last updated: 2026-11-24
+Last updated: 2026-11-25
 
 ## Status
-M0-M4 done and merged into `master`.
+M0-M4 done and merged into `master`. M5 (Shorts + embeds) planned on `feat/m5-shorts-embeds`.
 
 ## Current focus
-Daily use; pick the next idea from PLAN.md "Ideas / later".
+M5 Shorts + embeds: spike first (see PLAN.md M5).
 
 ## Next steps
-- Choose next idea (DeepL/LLM engine, Shorts/live, Web Store release) as M5.
+- M5 spike in Chrome: Shorts player/captions/swipe event/button spot; embeds: content script in iframe, Translator API under Permissions-Policy, video change inside embed.
+- Then `utils/page.ts` (page kind + video id + player selector), with tests.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: M5 planned: Shorts + embeds (user pick). Live streams stay in Ideas.
 - 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
 - 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
 - 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
@@ -22,7 +24,6 @@ Daily use; pick the next idea from PLAN.md "Ideas / later".
 - 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
 - 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
 - 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.
-- 2026-11-24: M0 spike results (Chrome 157, logged-in account): Translator en->ru works in isolated content script; direct json3 caption fetch works without `pot`; player's own caption XHR is interceptable in MAIN world.
 - 2026-11-15: WXT 0.21.5 + TS 5.9.3 + Vitest 5.1.0 scaffold; spike scripts (isolated + MAIN world) build.
 - 2026-11-14: project files created after kickoff grilling.
 

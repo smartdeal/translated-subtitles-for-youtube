@@ -1,11 +1,11 @@
 # Project plan
 
-Last updated: 2026-11-24
+Last updated: 2026-11-25
 
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: none (M0-M4 done; next from Ideas)
+Current milestone: M5 Shorts + embeds (planned)
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
@@ -14,6 +14,7 @@ Current milestone: none (M0-M4 done; next from Ideas)
 | M2 | Settings + cache | done | Popup settings; per-video cache |
 | M3 | Polish | done | SPA navigation, errors, model download progress |
 | M4 | Auto language | done | From = Auto (video's spoken language); skip videos already in target language |
+| M5 | Shorts + embeds | planned | Same subtitles on `/shorts/` and on embedded players (`/embed/`, youtube-nocookie) |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -23,7 +24,8 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 
 ## Scope
 - In: `youtube.com/watch`; existing YouTube captions (incl. auto-generated); Chrome built-in Translator API; dual-line or translation-only display; player-bar toggle; popup settings (target language, display mode, font size); per-video cache.
-- Out (not now): speech-to-text, other engines, Shorts, live streams, embedded players, Web Store release, mobile.
+- In (M5): `youtube.com/shorts/`; embedded players (`youtube.com/embed/`, `youtube-nocookie.com/embed/`).
+- Out (not now): speech-to-text, other engines, live streams, Web Store release, mobile.
 
 ## Architecture
 - Content script on `youtube.com/watch`:
@@ -74,19 +76,35 @@ Retro: TBD
 
 Retro: TBD
 
+### M5: Shorts + embeds
+- [ ] Spike in Chrome, results to STATE "Decisions" (no product code):
+  - Shorts: player element (`#shorts-player`?), `getPlayerResponse()` and `captionTracks` present, which event fires on swipe (`yt-navigate-finish`?), where a button fits (no `.ytp-subtitles-button`), overlay position over the Shorts UI.
+  - Embeds: content scripts in a cross-origin iframe (`all_frames`); Translator API there (Permissions-Policy `translator` is `self` by default, may be blocked on third-party sites); how a video change inside an embed (playlist, end screen) shows up without `yt-navigate-*`.
+- [ ] `utils/page.ts`: page kind (`watch` | `shorts` | `embed`) and video id from URL, player selector per kind; one module for these selectors. Unit tests. `youtube.content.ts` and MAIN world use it instead of `#movie_player` / `/watch`.
+- [ ] Shorts: button and overlay placement, session restart on swipe, native captions hidden.
+- [ ] Embeds: manifest matches for `/embed/*` on both hosts + `all_frames`; restart on video change inside the embed. Host permission change recorded in STATE "Decisions".
+- [ ] Translator API blocked in an embed: clear status text, no silent failure (test for the text).
+- [ ] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
+- [ ] Check in Chrome: a Short with captions (swipe to next), an embed on a third-party page, a youtube-nocookie embed; `/watch` still works.
+
+Retro: TBD
+
 ## Risks / unknowns
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).
 - YouTube SPA and DOM changes break selectors.
 - Sequential translation is slow on long tracks.
+- Embeds: Translator API may be blocked in cross-origin iframes by Permissions-Policy; a workaround (offscreen document) costs an extra permission.
+- Shorts UI changes more often than the watch page; selectors there are fragile.
 
 ## Ideas / later
 - Speech-to-text for videos without captions.
 - DeepL / LLM translation engines.
-- Shorts, live streams, embedded players.
+- Live streams (captions are a moving window, not a full track).
 - Chrome Web Store release.
 
 ## Plan changes
 <!-- newest first, one line each: YYYY-MM-DD: what changed; why. Keep ~20, move older to docs/plan/changes-archive.md -->
+- 2026-11-25: M5 Shorts + embeds picked from Ideas; same caption pipeline, medium size. Live streams stay in Ideas (different caption model).
 - 2026-11-24: M4 added (auto source language, skip same-language videos); user saw a Russian video translated en->ru from YouTube's auto-dub English track.
 - 2026-11-24: SPA navigation moved from M3 into M1; without it old subtitles stayed on the next video.
 - 2026-11-14: plan created from kickoff grilling.

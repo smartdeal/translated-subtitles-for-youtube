@@ -1,9 +1,10 @@
 // MAIN world: has access to YouTube's player object. Finds the caption
-// track for the requested language and returns it as json3. If a direct
-// fetch fails (e.g. YouTube starts to require a proof-of-origin token),
-// falls back to the response of the player's own caption request.
+// track for the requested language and returns it as json3 (see
+// utils/caption-fetch.ts for the direct fetch and its fallbacks).
+import { chooseTrack, loadTrackJson, parseJson3Text, type CaptionPlayer } from '../utils/caption-fetch';
 import type { Json3 } from '../utils/captions';
 import { detectSpokenLanguage, normalizeLang, type PlayerLanguageData } from '../utils/language';
+import { ALL_PLAYERS_SELECTOR, pickPlayer } from '../utils/page';
 import { FROM_ISOLATED, FROM_MAIN, isFrom, type CaptionsResponse, type GetCaptionsRequest } from '../utils/messages';
 
 interface CaptionTrack {
@@ -11,10 +12,10 @@ interface CaptionTrack {
   languageCode: string;
   kind?: string;
 }
-interface PlayerElement extends HTMLElement {
+interface PlayerElement extends HTMLElement, CaptionPlayer {
   getPlayerResponse?: () => {
     streamingData?: PlayerLanguageData['streamingData'];
-    videoDetails?: { videoId?: string };
+    videoDetails?: { videoId?: string; isLive?: boolean };
     captions?: { playerCaptionsTracklistRenderer?: { captionTracks?: CaptionTrack[] } };
   };
 }
@@ -23,13 +24,13 @@ interface PlayerElement extends HTMLElement {
 const intercepted = new Map<string, Json3>();
 
 function remember(url: string, body: string): void {
+  const json = parseJson3Text(body);
+  if (!json) return;
   try {
     const u = new URL(url, location.origin);
-    const json = JSON.parse(body) as Json3;
-    if (!Array.isArray(json.events)) return;
     intercepted.set(`${u.searchParams.get('v')}|${normalizeLang(u.searchParams.get('lang') ?? '')}`, json);
   } catch {
-    /* not json3: ignore */
+    /* bad URL: ignore */
   }
 }
 
@@ -54,11 +55,12 @@ function patchNetwork(): void {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** After SPA navigation the player may still hold the previous video for a moment. */
-async function playerResponseFor(videoId: string) {
+async function playerFor(videoId: string) {
   for (let i = 0; i < 25; i++) {
-    const player = document.querySelector<PlayerElement>('#movie_player');
+    const players = document.querySelectorAll<PlayerElement>(ALL_PLAYERS_SELECTOR);
+    const player = pickPlayer(players, videoId, (p) => p.getPlayerResponse?.()?.videoDetails?.videoId);
     const resp = player?.getPlayerResponse?.();
-    if (resp?.videoDetails?.videoId === videoId) return resp;
+    if (player && resp) return { player, resp };
     await sleep(200);
   }
   return undefined;
@@ -66,35 +68,26 @@ async function playerResponseFor(videoId: string) {
 
 async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
   const base = { source: FROM_MAIN, requestId: req.requestId } as const;
-  const resp = await playerResponseFor(req.videoId);
-  if (!resp) return { ...base, type: 'captions-error', reason: 'no-player' };
+  const found = await playerFor(req.videoId);
+  if (!found) return { ...base, type: 'captions-error', reason: 'no-player' };
+  const { player, resp } = found;
 
   const all = resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
   const spokenLanguage = detectSpokenLanguage(resp);
-  const lang = req.lang === 'auto' ? spokenLanguage : normalizeLang(req.lang);
-  if (!lang) {
-    const available = [...new Set(all.map((t) => t.languageCode))];
-    return { ...base, type: 'captions-error', reason: 'unknown-language', available };
-  }
-  const tracks = all.filter((t) => normalizeLang(t.languageCode) === lang);
-  const track = tracks.find((t) => t.kind !== 'asr') ?? tracks.find((t) => t.kind === 'asr');
-  if (!track) {
-    const available = [...new Set(all.map((t) => t.languageCode))];
-    return { ...base, type: 'captions-error', reason: 'no-track', available };
-  }
+  const choice = chooseTrack(all, req.lang, spokenLanguage, resp.videoDetails?.isLive === true);
+  if ('error' in choice) return { ...base, type: 'captions-error', reason: choice.error, available: choice.available };
+  const { track, lang } = choice;
   const ok = { ...base, type: 'captions', kind: track.kind === 'asr' ? 'asr' : 'manual', sourceLanguage: lang, spokenLanguage } as const;
 
-  try {
-    const res = await fetch(`${track.baseUrl}&fmt=json3`, { credentials: 'include' });
-    const text = await res.text();
-    if (res.ok && text) {
-      const json = JSON.parse(text) as Json3;
-      if (Array.isArray(json.events)) return { ...ok, json };
-    }
-  } catch {
-    /* fall through to the intercepted copy */
-  }
-  const json = intercepted.get(`${req.videoId}|${lang}`);
+  const json = await loadTrackJson({
+    player,
+    track,
+    fetchDirect: async () => {
+      const res = await fetch(`${track.baseUrl}&fmt=json3`, { credentials: 'include' });
+      return res.ok ? res.text() : '';
+    },
+    intercepted: () => intercepted.get(`${req.videoId}|${lang}`),
+  });
   if (json) return { ...ok, json };
   return { ...base, type: 'captions-error', reason: 'fetch-failed' };
 }

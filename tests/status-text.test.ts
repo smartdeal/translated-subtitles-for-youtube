@@ -17,6 +17,10 @@ describe('captionsErrorText', () => {
   it('has a text for every reason', () => {
     for (const r of ['no-player', 'fetch-failed', 'timeout'] as const) expect(captionsErrorText(r, 'en')).toBeTruthy();
   });
+
+  it('says live streams are not supported yet', () => {
+    expect(captionsErrorText('live', 'auto')).toBe('Live streams are not supported yet.');
+  });
 });
 
 describe('downloadText', () => {

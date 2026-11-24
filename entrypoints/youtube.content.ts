@@ -4,6 +4,7 @@ import { localStore } from '../utils/cache-store';
 import { ensureStyle } from '../utils/overlay';
 import { badgeText, createPlayerButton, updatePlayerButton } from '../utils/player-button';
 import { Session, type GetTranslator } from '../utils/session';
+import { BUTTON_ANCHOR_SELECTOR, parsePage, PLAYER_SELECTOR, type PageKind } from '../utils/page';
 import { loadSettings, watchSettings, type Settings } from '../utils/settings';
 import { needsClickText } from '../utils/status-text';
 import { createChromeTranslator, type TextTranslator } from '../utils/translator';
@@ -35,12 +36,12 @@ function dropTranslators(): void {
   translators.clear();
 }
 
-const videoIdFromUrl = () => (location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null);
+const currentPage = () => parsePage(location.href);
 const button = () => document.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
 const buttonLabel = () => `the ${badgeText(settings.targetLanguage)} subtitles button`;
 
-function playerParts() {
-  const player = document.querySelector<HTMLElement>('#movie_player');
+function playerParts(kind: PageKind) {
+  const player = document.querySelector<HTMLElement>(PLAYER_SELECTOR[kind]);
   const video = player?.querySelector<HTMLVideoElement>('video.html5-main-video');
   return player && video ? { player, video } : undefined;
 }
@@ -68,13 +69,13 @@ function onNeedsClick(from: string, to: string): void {
 
 async function startSession(): Promise<void> {
   stopSession();
-  const videoId = videoIdFromUrl();
-  const parts = playerParts();
-  if (!videoId || !parts) return;
+  const page = currentPage();
+  const parts = page && playerParts(page.kind);
+  if (!page || !parts) return;
   session = new Session(parts.player, parts.video, getTranslator, settings, cache, onNeedsClick);
   // When started from a click, the translator is created within Chrome's
   // user-activation window, so a first model download is allowed.
-  await session.start(videoId);
+  await session.start(page.videoId);
 }
 
 function onButtonClick(): void {
@@ -83,18 +84,18 @@ function onButtonClick(): void {
   else stopSession();
 }
 
+/** One button, moved to the native CC button of the current page (watch or Shorts). */
 function ensureButton(): void {
-  const existing = button();
-  if (existing) {
-    updatePlayerButton(existing, settings.targetLanguage, enabled);
-    return;
+  const page = currentPage();
+  const anchor = page && document.querySelector(BUTTON_ANCHOR_SELECTOR[page.kind]);
+  let btn = button();
+  if (page && anchor?.parentElement && btn?.nextElementSibling !== anchor) {
+    ensureStyle();
+    btn ??= createPlayerButton(BUTTON_CLASS, onButtonClick);
+    btn.classList.toggle('tp-shorts', page.kind === 'shorts');
+    anchor.parentElement.insertBefore(btn, anchor);
   }
-  const anchor = document.querySelector('#movie_player .ytp-subtitles-button');
-  if (!anchor?.parentElement) return;
-  ensureStyle();
-  const btn = createPlayerButton(BUTTON_CLASS, onButtonClick);
-  updatePlayerButton(btn, settings.targetLanguage, enabled);
-  anchor.parentElement.insertBefore(btn, anchor);
+  if (btn) updatePlayerButton(btn, settings.targetLanguage, enabled);
 }
 
 function onSettingsChanged(next: Settings): void {
@@ -108,7 +109,7 @@ function onSettingsChanged(next: Settings): void {
   }
   dropTranslators();
   // Restart with the new pair. If it needs a model download, the session asks for a click.
-  if (enabled && videoIdFromUrl()) void startSession();
+  if (enabled && currentPage()) void startSession();
 }
 
 export default defineContentScript({
@@ -132,7 +133,7 @@ export default defineContentScript({
     // YouTube is a SPA: a new video does not reload the page.
     const onNavStart = () => stopSession();
     const onNavFinish = () => {
-      if (enabled && videoIdFromUrl()) void startSession();
+      if (enabled && currentPage()) void startSession();
     };
     document.addEventListener('yt-navigate-start', onNavStart);
     document.addEventListener('yt-navigate-finish', onNavFinish);

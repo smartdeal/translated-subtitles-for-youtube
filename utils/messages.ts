@@ -36,7 +36,7 @@ export type CaptionsResponse =
       available?: string[];
     };
 
-export type CaptionsErrorReason = 'no-player' | 'no-track' | 'fetch-failed' | 'timeout' | 'unknown-language';
+export type CaptionsErrorReason = 'no-player' | 'no-track' | 'fetch-failed' | 'timeout' | 'unknown-language' | 'live';
 
 export function isFrom<T extends { source: string }>(e: MessageEvent, source: T['source']): e is MessageEvent<T> {
   return e.source === window && e.origin === location.origin && e.data?.source === source;

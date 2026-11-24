@@ -34,6 +34,15 @@ export const PLAYER_SELECTOR: Readonly<Record<PageKind, string>> = {
 export const ALL_PLAYERS_SELECTOR = Object.values(PLAYER_SELECTOR).join(',');
 
 /**
+ * Our button goes right before this element (the native CC button).
+ * Shorts controls live outside `#shorts-player` and are rebuilt on every swipe.
+ */
+export const BUTTON_ANCHOR_SELECTOR: Readonly<Record<PageKind, string>> = {
+  watch: `${PLAYER_SELECTOR.watch} .ytp-subtitles-button`,
+  shorts: 'ytd-shorts-player-controls #closed-captioning-button-container',
+};
+
+/**
  * The player that holds `videoId`. Matching by id (not by selector) skips the
  * hidden player that may still hold an older video.
  */

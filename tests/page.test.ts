@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_PLAYERS_SELECTOR, parsePage, pickPlayer, PLAYER_SELECTOR } from '../utils/page';
+import { ALL_PLAYERS_SELECTOR, BUTTON_ANCHOR_SELECTOR, parsePage, pickPlayer, PLAYER_SELECTOR } from '../utils/page';
 
 const ID = 'q_As0l3Dyjo';
 
@@ -34,6 +34,14 @@ describe('player selectors', () => {
   it('has one selector per kind and a combined one', () => {
     expect(PLAYER_SELECTOR).toEqual({ watch: '#movie_player', shorts: '#shorts-player' });
     expect(ALL_PLAYERS_SELECTOR).toBe('#movie_player,#shorts-player');
+  });
+
+  it('puts the button before the native CC button of each page kind', () => {
+    // Shorts controls live outside #shorts-player and are rebuilt on every swipe.
+    expect(BUTTON_ANCHOR_SELECTOR).toEqual({
+      watch: '#movie_player .ytp-subtitles-button',
+      shorts: 'ytd-shorts-player-controls #closed-captioning-button-container',
+    });
   });
 });
 

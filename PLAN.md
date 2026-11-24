@@ -80,7 +80,7 @@ Retro: TBD
 - [x] Spike in Chrome (results in STATE "Decisions"). Embeds dropped from M5: Translator API is blocked there.
 - [x] `utils/page.ts`: page kind (`watch` | `shorts`), video id from URL, player selector per kind (`#movie_player` / `#shorts-player`; on Shorts a hidden 0x0 `#movie_player` also exists). Unit tests. `youtube.content.ts` and the MAIN world use it.
 - [x] Captions on Shorts: direct json3 fetch returns an empty body; if empty, call `player.setOption('captions','track',{languageCode})` so the player sends its own request (with `pot`), take the intercepted copy, then restore the user's CC state. Test for the empty-body path.
-- [ ] Shorts button: before `#closed-captioning-button-container` in the active `ytd-shorts-player-controls #right-controls`; own style to match the 48 px round buttons.
+- [x] Shorts button: before `#closed-captioning-button-container` in the active `ytd-shorts-player-controls #right-controls`; own style to match the 48 px round buttons.
 - [ ] Shorts overlay: inside `#shorts-player`, clear of the bottom title/channel overlay; native captions hidden. Restart on swipe (`yt-navigate-finish`, same `<video>` reused).
 - [ ] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
 - [ ] Check in Chrome: a Short with captions, swipe to next and back, a Short without captions; `/watch` still works.

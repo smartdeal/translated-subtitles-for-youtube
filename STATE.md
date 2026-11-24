@@ -9,11 +9,12 @@ M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-
 M5 Shorts: implementation (see PLAN.md M5).
 
 ## Next steps
-- Shorts button (before `#closed-captioning-button-container`); today the button exists only on /watch, so Shorts work only after turning it on there.
-- Then Shorts overlay placement (native CC hidden on `#shorts-player`), live-stream note.
+- Shorts overlay placement (native CC hidden on `#shorts-player`, clear of the title overlay), live-stream note.
+- Fix: video without any caption track shows "Could not tell which language" instead of "no subtitles".
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: Shorts button: one button moved to the CC button of the current page (`BUTTON_ANCHOR_SELECTOR` in `utils/page.ts`), `tp-shorts` style (48 px round). Shorts controls have `pointer-events:none`: button needs `pointer-events:auto` or clicks hit the video. Checked in Chrome: looks like the native controls; click translates without pausing; swipe -> button re-inserted, stays on, session restarts.
 - 2026-11-25: Shorts captions: `utils/caption-fetch.ts` loadTrackJson (direct fetch -> intercepted copy -> ask player via setOption, wait <=5 s, restore user's CC track). Isolated caption timeout 10 -> 15 s. 43 unit tests. Checked in Chrome: /watch still direct fetch only; English Short en->ru in 3.4 s via player XHR with `pot`, CC back off; Russian Short with en dub -> "already in Russian".
 - 2026-11-25: `utils/page.ts` (watch/shorts, 11-char video id, player selectors; MAIN world picks the player by video id). 35 unit tests. Checked in Chrome: TED en->ru on /watch; SPA to a Short with button on -> overlay on `#shorts-player`, expected fetch-failed text.
 - 2026-11-25: M5 spike done in Chrome (Shorts + embeds); embeds dropped from M5 (user pick), see Decisions.
@@ -23,7 +24,6 @@ M5 Shorts: implementation (see PLAN.md M5).
 - 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
 - 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 - 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
-- 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
 
 ## Decisions
 <!-- decision: reason -->

@@ -16,6 +16,9 @@ const CSS = `
 .tp-badge{position:absolute;top:6px;right:5px;padding:1px 3px;border-radius:2px;font:700 9px/1 Roboto,Arial,sans-serif;
   letter-spacing:.2px;color:#fff;background:#606060;pointer-events:none}
 .tp-button[aria-pressed="true"] .tp-badge{background:#e1002d}
+.tp-button.tp-shorts{pointer-events:auto;position:relative;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer}
+.tp-button.tp-shorts:hover{background:rgba(255,255,255,.1)}
+.tp-button.tp-shorts .tp-badge{top:8px;right:6px}
 `;
 
 export class Overlay {

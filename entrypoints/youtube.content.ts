@@ -4,7 +4,7 @@ import { localStore } from '../utils/cache-store';
 import { ensureStyle } from '../utils/overlay';
 import { badgeText, createPlayerButton, updatePlayerButton } from '../utils/player-button';
 import { Session, type GetTranslator } from '../utils/session';
-import { parsePage, PLAYER_SELECTOR, type PageKind } from '../utils/page';
+import { BUTTON_ANCHOR_SELECTOR, parsePage, PLAYER_SELECTOR, type PageKind } from '../utils/page';
 import { loadSettings, watchSettings, type Settings } from '../utils/settings';
 import { needsClickText } from '../utils/status-text';
 import { createChromeTranslator, type TextTranslator } from '../utils/translator';
@@ -84,18 +84,18 @@ function onButtonClick(): void {
   else stopSession();
 }
 
+/** One button, moved to the native CC button of the current page (watch or Shorts). */
 function ensureButton(): void {
-  const existing = button();
-  if (existing) {
-    updatePlayerButton(existing, settings.targetLanguage, enabled);
-    return;
+  const page = currentPage();
+  const anchor = page && document.querySelector(BUTTON_ANCHOR_SELECTOR[page.kind]);
+  let btn = button();
+  if (page && anchor?.parentElement && btn?.nextElementSibling !== anchor) {
+    ensureStyle();
+    btn ??= createPlayerButton(BUTTON_CLASS, onButtonClick);
+    btn.classList.toggle('tp-shorts', page.kind === 'shorts');
+    anchor.parentElement.insertBefore(btn, anchor);
   }
-  const anchor = document.querySelector(`${PLAYER_SELECTOR.watch} .ytp-subtitles-button`);
-  if (!anchor?.parentElement) return;
-  ensureStyle();
-  const btn = createPlayerButton(BUTTON_CLASS, onButtonClick);
-  updatePlayerButton(btn, settings.targetLanguage, enabled);
-  anchor.parentElement.insertBefore(btn, anchor);
+  if (btn) updatePlayerButton(btn, settings.targetLanguage, enabled);
 }
 
 function onSettingsChanged(next: Settings): void {

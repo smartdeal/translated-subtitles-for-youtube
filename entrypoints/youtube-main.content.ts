@@ -1,7 +1,7 @@
 // MAIN world: has access to YouTube's player object. Finds the caption
 // track for the requested language and returns it as json3 (see
 // utils/caption-fetch.ts for the direct fetch and its fallbacks).
-import { loadTrackJson, parseJson3Text, type CaptionPlayer } from '../utils/caption-fetch';
+import { chooseTrack, loadTrackJson, parseJson3Text, type CaptionPlayer } from '../utils/caption-fetch';
 import type { Json3 } from '../utils/captions';
 import { detectSpokenLanguage, normalizeLang, type PlayerLanguageData } from '../utils/language';
 import { ALL_PLAYERS_SELECTOR, pickPlayer } from '../utils/page';
@@ -74,17 +74,9 @@ async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
 
   const all = resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
   const spokenLanguage = detectSpokenLanguage(resp);
-  const lang = req.lang === 'auto' ? spokenLanguage : normalizeLang(req.lang);
-  if (!lang) {
-    const available = [...new Set(all.map((t) => t.languageCode))];
-    return { ...base, type: 'captions-error', reason: 'unknown-language', available };
-  }
-  const tracks = all.filter((t) => normalizeLang(t.languageCode) === lang);
-  const track = tracks.find((t) => t.kind !== 'asr') ?? tracks.find((t) => t.kind === 'asr');
-  if (!track) {
-    const available = [...new Set(all.map((t) => t.languageCode))];
-    return { ...base, type: 'captions-error', reason: 'no-track', available };
-  }
+  const choice = chooseTrack(all, req.lang, spokenLanguage);
+  if ('error' in choice) return { ...base, type: 'captions-error', reason: choice.error, available: choice.available };
+  const { track, lang } = choice;
   const ok = { ...base, type: 'captions', kind: track.kind === 'asr' ? 'asr' : 'manual', sourceLanguage: lang, spokenLanguage } as const;
 
   const json = await loadTrackJson({

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loadTrackJson, type CaptionPlayer } from '../utils/caption-fetch';
+import { chooseTrack, loadTrackJson, type CaptionPlayer } from '../utils/caption-fetch';
 import type { Json3 } from '../utils/captions';
 
 const JSON3: Json3 = { events: [{ tStartMs: 0, dDurationMs: 1000, segs: [{ utf8: 'hi' }] }] };
@@ -84,5 +84,32 @@ describe('loadTrackJson', () => {
   it('without a player API it returns undefined instead of throwing', async () => {
     const json = await loadTrackJson({ ...fast, player: {}, track: TRACK, fetchDirect: async () => '', intercepted: () => undefined });
     expect(json).toBeUndefined();
+  });
+});
+
+describe('chooseTrack', () => {
+  const t = (languageCode: string, kind?: string) => ({ languageCode, kind });
+
+  it('a video without any caption track is "no-track", not "unknown-language"', () => {
+    // Real case: a Short with no captions and no audio-track info.
+    expect(chooseTrack([], 'auto', undefined)).toEqual({ error: 'no-track', available: [] });
+    expect(chooseTrack([], 'en', undefined)).toEqual({ error: 'no-track', available: [] });
+  });
+
+  it('unknown spoken language with tracks present is "unknown-language"', () => {
+    expect(chooseTrack([t('en', 'asr'), t('de')], 'auto', undefined)).toEqual({
+      error: 'unknown-language',
+      available: ['en', 'de'],
+    });
+  });
+
+  it('prefers a manual track over ASR and normalizes the language', () => {
+    const manual = t('en-GB');
+    expect(chooseTrack([t('en-US', 'asr'), manual], 'auto', 'en')).toEqual({ track: manual, lang: 'en' });
+    expect(chooseTrack([t('en-US', 'asr')], 'en-US', undefined)).toEqual({ track: t('en-US', 'asr'), lang: 'en' });
+  });
+
+  it('lists available languages when the wanted one is missing', () => {
+    expect(chooseTrack([t('ru', 'asr'), t('ru')], 'en', 'ru')).toEqual({ error: 'no-track', available: ['ru'] });
   });
 });

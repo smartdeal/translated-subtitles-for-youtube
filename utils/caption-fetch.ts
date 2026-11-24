@@ -5,6 +5,7 @@
 //    carries a proof-of-origin token, so ask the player to load the track,
 //    wait for the intercepted copy, then put the user's CC state back.
 import type { Json3 } from './captions';
+import { normalizeLang } from './language';
 
 /** The parts of YouTube's player API used here. All optional: YouTube may drop them. */
 export interface CaptionPlayer {
@@ -27,6 +28,25 @@ export interface LoadTrackOptions {
   intercepted: () => Json3 | undefined;
   timeoutMs?: number;
   pollMs?: number;
+}
+
+export type TrackChoice<T> =
+  | { track: T; lang: string }
+  | { error: 'no-track' | 'unknown-language'; available: string[] };
+
+/**
+ * The track to translate: `reqLang` ('auto' = the spoken language), manual
+ * before ASR. A video with no tracks at all is 'no-track' even when its
+ * language is unknown: "no subtitles" is the real reason.
+ */
+export function chooseTrack<T extends TrackRef>(all: T[], reqLang: string, spokenLanguage: string | undefined): TrackChoice<T> {
+  const available = [...new Set(all.map((t) => t.languageCode))];
+  if (!all.length) return { error: 'no-track', available };
+  const lang = reqLang === 'auto' ? spokenLanguage : normalizeLang(reqLang);
+  if (!lang) return { error: 'unknown-language', available };
+  const tracks = all.filter((t) => normalizeLang(t.languageCode) === lang);
+  const track = tracks.find((t) => t.kind !== 'asr') ?? tracks.find((t) => t.kind === 'asr');
+  return track ? { track, lang } : { error: 'no-track', available };
 }
 
 export function parseJson3Text(text: string): Json3 | undefined {

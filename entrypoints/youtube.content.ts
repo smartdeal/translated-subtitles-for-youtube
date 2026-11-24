@@ -4,6 +4,7 @@ import { localStore } from '../utils/cache-store';
 import { ensureStyle, Overlay } from '../utils/overlay';
 import { Session } from '../utils/session';
 import { loadSettings, watchSettings, type Settings } from '../utils/settings';
+import { downloadText } from '../utils/status-text';
 import { createChromeTranslator, type TextTranslator } from '../utils/translator';
 
 const BUTTON_CLASS = 'tp-button';
@@ -55,11 +56,11 @@ async function onButtonClick(): Promise<void> {
     try {
       // Must run inside the click: the first create() needs a user gesture.
       translator = await createChromeTranslator(settings.sourceLanguage, settings.targetLanguage, (f) =>
-        status?.setStatus(`Downloading translation model… ${Math.round(f * 100)}%`),
+        status?.setStatus(downloadText(f)),
       );
     } catch (err) {
       status?.setStatus(err instanceof Error ? err.message : 'Translator failed to start.');
-      setTimeout(() => status?.destroy(), 5000);
+      setTimeout(() => status?.destroy(), 8000);
       setEnabled(false);
       return;
     }

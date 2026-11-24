@@ -3,7 +3,7 @@
 Last updated: 2026-11-24
 
 ## Status
-M2 done and checked on `feat/m2-settings-cache` (not merged); M3 next.
+M3 code on `feat/m3-polish`; unit tests pass; browser check pending.
 
 ## Current focus
 M3: polish (error states, model download progress).
@@ -14,6 +14,7 @@ M3: polish (error states, model download progress).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
 - 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
 - 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
 - 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.

@@ -21,8 +21,13 @@ export async function createChromeTranslator(
     throw new TranslatorUnavailableError('Chrome Translator API is not available (needs desktop Chrome 138+).');
   }
   const langs = { sourceLanguage, targetLanguage };
+  if (sourceLanguage === targetLanguage) {
+    throw new TranslatorUnavailableError('"From" and "To" are the same language. Change one in the extension popup.');
+  }
   if ((await Translator.availability(langs)) === 'unavailable') {
-    throw new TranslatorUnavailableError(`Language pair ${sourceLanguage} -> ${targetLanguage} is not supported.`);
+    throw new TranslatorUnavailableError(
+      `Chrome cannot translate ${sourceLanguage} -> ${targetLanguage}. Pick another pair in the extension popup.`,
+    );
   }
   const t = await Translator.create({
     ...langs,

@@ -16,9 +16,16 @@ export interface GetCaptionsRequest {
 
 export type CaptionsResponse =
   | { source: typeof FROM_MAIN; type: 'captions'; requestId: string; kind: 'asr' | 'manual'; json: Json3 }
-  | { source: typeof FROM_MAIN; type: 'captions-error'; requestId: string; reason: CaptionsErrorReason };
+  | {
+      source: typeof FROM_MAIN;
+      type: 'captions-error';
+      requestId: string;
+      reason: CaptionsErrorReason;
+      /** Caption languages the video does have (for 'no-track'). */
+      available?: string[];
+    };
 
-export type CaptionsErrorReason = 'no-player' | 'no-track' | 'fetch-failed';
+export type CaptionsErrorReason = 'no-player' | 'no-track' | 'fetch-failed' | 'timeout';
 
 export function isFrom<T extends { source: string }>(e: MessageEvent, source: T['source']): e is MessageEvent<T> {
   return e.source === window && e.origin === location.origin && e.data?.source === source;

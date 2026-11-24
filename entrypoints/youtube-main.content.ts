@@ -68,11 +68,13 @@ async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
   const resp = await playerResponseFor(req.videoId);
   if (!resp) return { ...base, type: 'captions-error', reason: 'no-player' };
 
-  const tracks = (resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? []).filter(
-    (t) => baseLang(t.languageCode) === req.lang,
-  );
+  const all = resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
+  const tracks = all.filter((t) => baseLang(t.languageCode) === baseLang(req.lang));
   const track = tracks.find((t) => t.kind !== 'asr') ?? tracks.find((t) => t.kind === 'asr');
-  if (!track) return { ...base, type: 'captions-error', reason: 'no-track' };
+  if (!track) {
+    const available = [...new Set(all.map((t) => t.languageCode))];
+    return { ...base, type: 'captions-error', reason: 'no-track', available };
+  }
   const kind = track.kind === 'asr' ? 'asr' : 'manual';
 
   try {
@@ -85,7 +87,7 @@ async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
   } catch {
     /* fall through to the intercepted copy */
   }
-  const json = intercepted.get(`${req.videoId}|${req.lang}`);
+  const json = intercepted.get(`${req.videoId}|${baseLang(req.lang)}`);
   if (json) return { ...base, type: 'captions', kind, json };
   return { ...base, type: 'captions-error', reason: 'fetch-failed' };
 }

@@ -3,17 +3,19 @@
 Last updated: 2026-11-24
 
 ## Status
-M4 (auto language) code on `feat/m4-auto-language` (branched from unmerged `feat/m3-polish`); browser check pending.
+M4 done and checked on `feat/m4-auto-language` (includes unmerged M3). Waiting for merge.
 
 ## Current focus
-M4: From = Auto (video's spoken language); skip videos already in the target language.
+Daily use; pick the next idea from PLAN.md "Ideas / later".
 
 ## Next steps
-- Browser check of M4 (Russian video -> "already in Russian"; English video -> en->ru with Auto; new pair needs click).
-- Then merge M3 + M4 (ask user).
+- Merge `feat/m4-auto-language` (contains M3) into `master` (ask user).
+- Choose next idea (DeepL/LLM engine, Shorts/live, Web Store release) as M5.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
+- 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
 - 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
 - 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 - 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.

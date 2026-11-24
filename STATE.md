@@ -3,17 +3,18 @@
 Last updated: 2026-11-24
 
 ## Status
-M2 code written on `feat/m2-settings-cache`; unit tests pass; browser check pending.
+M2 done and checked on `feat/m2-settings-cache` (not merged); M3 next.
 
 ## Current focus
-M2: popup settings + per-video cache.
+M3: polish (error states, model download progress).
 
 ## Next steps
-- M2: popup settings (target language, display mode, font size) in `chrome.storage.sync`; `DEFAULT_SETTINGS` is the only place with language codes now.
-- M2: per-video translation cache in `chrome.storage.local`.
+- M3: error states (no captions, unsupported pair, API unavailable): see one in a real browser.
+- M3: model download progress indicator (basic status line exists; polish it).
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
 - 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
 - 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
 - 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.

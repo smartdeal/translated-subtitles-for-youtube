@@ -113,3 +113,15 @@ describe('chooseTrack', () => {
     expect(chooseTrack([t('ru', 'asr'), t('ru')], 'en', 'ru')).toEqual({ error: 'no-track', available: ['ru'] });
   });
 });
+
+describe('chooseTrack on live streams', () => {
+  it('a live stream is "live" even when it has caption tracks', () => {
+    // Live captions are a moving window, not a full track.
+    expect(chooseTrack([{ languageCode: 'en', kind: 'asr' }], 'auto', 'en', true)).toEqual({ error: 'live', available: [] });
+  });
+
+  it('a past stream (not live now) is a normal video', () => {
+    const track = { languageCode: 'en', kind: 'asr' };
+    expect(chooseTrack([track], 'auto', 'en', false)).toEqual({ track, lang: 'en' });
+  });
+});

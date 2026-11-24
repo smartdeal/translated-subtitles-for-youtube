@@ -32,14 +32,21 @@ export interface LoadTrackOptions {
 
 export type TrackChoice<T> =
   | { track: T; lang: string }
-  | { error: 'no-track' | 'unknown-language'; available: string[] };
+  | { error: 'no-track' | 'unknown-language' | 'live'; available: string[] };
 
 /**
  * The track to translate: `reqLang` ('auto' = the spoken language), manual
  * before ASR. A video with no tracks at all is 'no-track' even when its
- * language is unknown: "no subtitles" is the real reason.
+ * language is unknown: "no subtitles" is the real reason. A live stream is
+ * 'live': its captions are a moving window, not a full track.
  */
-export function chooseTrack<T extends TrackRef>(all: T[], reqLang: string, spokenLanguage: string | undefined): TrackChoice<T> {
+export function chooseTrack<T extends TrackRef>(
+  all: T[],
+  reqLang: string,
+  spokenLanguage: string | undefined,
+  isLive = false,
+): TrackChoice<T> {
+  if (isLive) return { error: 'live', available: [] };
   const available = [...new Set(all.map((t) => t.languageCode))];
   if (!all.length) return { error: 'no-track', available };
   const lang = reqLang === 'auto' ? spokenLanguage : normalizeLang(reqLang);

@@ -5,7 +5,7 @@ Last updated: 2026-11-25
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M5 Shorts (spike done)
+Current milestone: none (M0-M5 done; next from Ideas)
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
@@ -14,7 +14,7 @@ Current milestone: M5 Shorts (spike done)
 | M2 | Settings + cache | done | Popup settings; per-video cache |
 | M3 | Polish | done | SPA navigation, errors, model download progress |
 | M4 | Auto language | done | From = Auto (video's spoken language); skip videos already in target language |
-| M5 | Shorts | in progress | Same subtitles on `/shorts/` |
+| M5 | Shorts | done | Same subtitles on `/shorts/` |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -82,8 +82,8 @@ Retro: TBD
 - [x] Captions on Shorts: direct json3 fetch returns an empty body; if empty, call `player.setOption('captions','track',{languageCode})` so the player sends its own request (with `pot`), take the intercepted copy, then restore the user's CC state. Test for the empty-body path.
 - [x] Shorts button: before `#closed-captioning-button-container` in the active `ytd-shorts-player-controls #right-controls`; own style to match the 48 px round buttons.
 - [x] Shorts overlay: inside `#shorts-player`, clear of the bottom title/channel overlay; native captions hidden. Restart on swipe (`yt-navigate-finish`, same `<video>` reused).
-- [ ] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
-- [ ] Check in Chrome: a Short with captions, swipe to next and back, a Short without captions; `/watch` still works.
+- [x] Live stream (`videoDetails.isLive`): status "Live streams are not supported yet" instead of a broken session.
+- [x] Check in Chrome: a Short with captions, swipe to next and back, a Short without captions; `/watch` still works.
 
 Retro: TBD
 

@@ -34,6 +34,8 @@ export function captionsErrorText(
       return 'Could not load subtitles. Turn on CC once, then try again.';
     case 'timeout':
       return 'Subtitles did not load in time. Reload the page and try again.';
+    case 'live':
+      return 'Live streams are not supported yet.';
     case 'unknown-language':
       return 'Could not tell which language this video is in. Set "From" in the extension popup.';
   }

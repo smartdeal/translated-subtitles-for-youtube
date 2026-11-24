@@ -15,7 +15,7 @@ interface CaptionTrack {
 interface PlayerElement extends HTMLElement, CaptionPlayer {
   getPlayerResponse?: () => {
     streamingData?: PlayerLanguageData['streamingData'];
-    videoDetails?: { videoId?: string };
+    videoDetails?: { videoId?: string; isLive?: boolean };
     captions?: { playerCaptionsTracklistRenderer?: { captionTracks?: CaptionTrack[] } };
   };
 }
@@ -74,7 +74,7 @@ async function getCaptions(req: GetCaptionsRequest): Promise<CaptionsResponse> {
 
   const all = resp.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
   const spokenLanguage = detectSpokenLanguage(resp);
-  const choice = chooseTrack(all, req.lang, spokenLanguage);
+  const choice = chooseTrack(all, req.lang, spokenLanguage, resp.videoDetails?.isLive === true);
   if ('error' in choice) return { ...base, type: 'captions-error', reason: choice.error, available: choice.available };
   const { track, lang } = choice;
   const ok = { ...base, type: 'captions', kind: track.kind === 'asr' ? 'asr' : 'manual', sourceLanguage: lang, spokenLanguage } as const;

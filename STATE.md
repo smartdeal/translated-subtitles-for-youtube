@@ -3,17 +3,18 @@
 Last updated: 2026-11-25
 
 ## Status
-M0-M4 done and merged into `master`. M5 (Shorts) in progress on `feat/m5-shorts-embeds`; spike done.
+M0-M4 merged into `master`. M5 (Shorts) done on `feat/m5-shorts-embeds`, not merged yet (waits for user).
 
 ## Current focus
-M5 Shorts: implementation (see PLAN.md M5).
+M5 done; merge to master after user OK, then M5 retro.
 
 ## Next steps
-- Live-stream note (`videoDetails.isLive`).
-- Final M5 check on the real build: Short with captions + swipe, Short without captions, /watch (also re-check overlay centering there).
+- Merge `feat/m5-shorts-embeds` into `master` (ask first).
+- M5 retro (two questions), then pick M6 from PLAN.md Ideas.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-25: M5 done. Live streams: `chooseTrack(..., isLive)` -> 'live' -> "Live streams are not supported yet." 51 unit tests. Final check on the real build: CNN live -> live text; TED /watch translates, overlay centered, 80% width; SPA to Shorts with button on: no-subtitles x2, en->ru in 2.8 s, "already in Russian", silent Short shows nothing until speech at 29 s (correct); one button, stays on through swipes, native CC hidden.
 - 2026-11-25: Shorts overlay: `bottom:22%` (title panel covers ~87-97% in narrow layout), smaller font limits, native CC hidden on any `.tp-active` player. Fixed centering: `left:50%`+`translateX(-50%)` capped the box at half the player width and wrapped short lines; now `left:0;right:0;margin:auto`. Checked in Chrome with the rules injected live (wide + 700 px window); real build not yet reloaded.
 - 2026-11-25: Fix: a video with no caption tracks (and unknown language) said "Could not tell which language"; now "This video has no subtitles." Track choice moved to `chooseTrack` in `utils/caption-fetch.ts`. 48 unit tests. Checked in Chrome on a Short without captions; built `pointer-events:auto` CSS confirmed (click does not pause).
 - 2026-11-25: Shorts button: one button moved to the CC button of the current page (`BUTTON_ANCHOR_SELECTOR` in `utils/page.ts`), `tp-shorts` style (48 px round). Shorts controls have `pointer-events:none`: button needs `pointer-events:auto` or clicks hit the video. Checked in Chrome: looks like the native controls; click translates without pausing; swipe -> button re-inserted, stays on, session restarts.
@@ -23,7 +24,6 @@ M5 Shorts: implementation (see PLAN.md M5).
 - 2026-11-25: M5 planned: Shorts + embeds (user pick). Live streams stay in Ideas.
 - 2026-11-24: Player button redesigned: own SVG subtitle icon (22x18 glyph like CC) + target-language badge (grey off, red on). User confirmed look.
 - 2026-11-24: M4 checked in Chrome: TED en->ru with Auto; Russian video with en auto-dub -> "already in Russian"; German video via SPA -> asks for click, click downloads de->ru model, subtitles translate.
-- 2026-11-24: M4 code: `utils/language.ts` detectSpokenLanguage, From=Auto default, translator per pair, "already in X" note. 28 unit tests.
 
 ## Decisions
 <!-- decision: reason -->

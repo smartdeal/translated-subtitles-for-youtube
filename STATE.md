@@ -3,13 +3,12 @@
 Last updated: 2026-11-24
 
 ## Status
-M4 done and checked on `feat/m4-auto-language` (includes unmerged M3). Waiting for merge.
+M0-M4 done and merged into `master`.
 
 ## Current focus
 Daily use; pick the next idea from PLAN.md "Ideas / later".
 
 ## Next steps
-- Merge `feat/m4-auto-language` (contains M3) into `master` (ask user).
 - Choose next idea (DeepL/LLM engine, Shorts/live, Web Store release) as M5.
 
 ## Recent changes

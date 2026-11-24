@@ -3,13 +3,13 @@
 Last updated: 2026-11-25
 
 ## Status
-M0-M5 done and merged into `master`.
+M0-M5 done and merged into `master`. M6 (Web Store release) in progress on `feat/m6-web-store`.
 
 ## Current focus
-Daily use; pick M6 from PLAN.md Ideas.
+M6: prepare and submit the Web Store release.
 
 ## Next steps
-- Pick M6 from PLAN.md Ideas (DeepL/LLM engine, embeds via offscreen, live streams, speech-to-text, Web Store).
+- M6 tasks in PLAN.md: manifest, icons, README/PRIVACY, store kit, GitHub Pages, zip check, upload.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
@@ -26,6 +26,7 @@ Daily use; pick M6 from PLAN.md Ideas.
 
 ## Decisions
 <!-- decision: reason -->
+- Store: name "Translated Subtitles for YouTube" ("YouTube" only as "for YouTube" per brand rules), Unlisted first, English listing, privacy policy on GitHub Pages.
 - Chrome built-in Translator API first: free, private, no key; engine behind an interface for DeepL/LLM later.
 - WXT + TypeScript: MV3 and hot reload out of the box; easy Web Store release later.
 - Translate ahead from playback position + cache per video in `chrome.storage.local`: API is sequential; seek/rewatch stay instant.

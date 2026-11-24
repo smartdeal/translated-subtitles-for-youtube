@@ -5,7 +5,7 @@ Last updated: 2026-11-25
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: none (M0-M5 done; next from Ideas)
+Current milestone: M6 Web Store release
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
@@ -15,6 +15,7 @@ Current milestone: none (M0-M5 done; next from Ideas)
 | M3 | Polish | done | SPA navigation, errors, model download progress |
 | M4 | Auto language | done | From = Auto (video's spoken language); skip videos already in target language |
 | M5 | Shorts | done | Same subtitles on `/shorts/` |
+| M6 | Web Store | in progress | Unlisted release as "Translated Subtitles for YouTube" |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -25,7 +26,8 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 ## Scope
 - In: `youtube.com/watch`; existing YouTube captions (incl. auto-generated); Chrome built-in Translator API; dual-line or translation-only display; player-bar toggle; popup settings (target language, display mode, font size); per-video cache.
 - In (M5): `youtube.com/shorts/`.
-- Out (not now): speech-to-text, other engines, live streams, embedded players, Web Store release, mobile.
+- Out (not now): speech-to-text, other engines, live streams, embedded players, mobile.
+- In (M6): Chrome Web Store release (unlisted, English listing).
 
 ## Architecture
 - Content script on `youtube.com/watch`:
@@ -87,6 +89,16 @@ Retro: TBD
 
 Retro: skipped (user).
 
+### M6: Web Store release
+Name "Translated Subtitles for YouTube", Unlisted, English listing only, privacy policy on GitHub Pages.
+- [ ] Manifest: name, description (<=132 chars), version 1.0.0, `minimum_chrome_version` 138, `homepage_url`.
+- [ ] Icons 16/32/48/128 from the player-button glyph (`public/icon/`); 128 = 96 px art + 16 px padding.
+- [ ] `README.md` + `PRIVACY.md` (no data collected; settings/cache in `chrome.storage`; captions translated on device).
+- [ ] Store kit in `docs/store/`: listing text, single purpose, permission justifications, data-use answers; screenshots 1280x800; small promo tile 440x280.
+- [ ] GitHub repo + Pages for the privacy policy URL (user OK before push).
+- [ ] `npm run zip`; load the zip contents unpacked in Chrome and re-check golden path.
+- [ ] Upload (user: developer account, $5 fee, 2-step verification), fill dashboard from `docs/store/`, submit as Unlisted.
+
 ## Risks / unknowns
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).
 - YouTube SPA and DOM changes break selectors.
@@ -98,10 +110,10 @@ Retro: skipped (user).
 - DeepL / LLM translation engines.
 - Live streams (captions are a moving window, not a full track).
 - Embedded players (`/embed/`, youtube-nocookie): Translator API blocked by Permissions-Policy in normal embeds (2026-11-25 spike). Possible route: translate in an extension offscreen document (`offscreen` permission); untested whether Translator works there and whether a model download can start without a page gesture.
-- Chrome Web Store release.
 
 ## Plan changes
 <!-- newest first, one line each: YYYY-MM-DD: what changed; why. Keep ~20, move older to docs/plan/changes-archive.md -->
+- 2026-11-25: M6 Web Store release picked from Ideas (user): Unlisted first, English listing, privacy policy on GitHub Pages.
 - 2026-11-25: M5 cut to Shorts; spike showed Translator API blocked in normal embeds (Permissions-Policy, content scripts do not bypass). Embeds back to Ideas with the offscreen idea.
 - 2026-11-25: M5 Shorts + embeds picked from Ideas; same caption pipeline, medium size. Live streams stay in Ideas (different caption model).
 - 2026-11-24: M4 added (auto source language, skip same-language videos); user saw a Russian video translated en->ru from YouTube's auto-dub English track.

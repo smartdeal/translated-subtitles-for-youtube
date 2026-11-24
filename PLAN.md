@@ -96,7 +96,7 @@ Name "Translated Subtitles for YouTube", Unlisted, English listing only, privacy
 - [x] Default target language = browser UI language (was `ru`; wrong for a public listing).
 - [x] `README.md` + `PRIVACY.md` (no data collected; settings/cache in `chrome.storage`; captions translated on device).
 - [x] Store kit in `docs/store/`: listing text, single purpose, permission justifications, data-use answers, small promo tile 440x280, screenshots 1280x800 (watch + Shorts).
-- [ ] GitHub repo + Pages for the privacy policy URL (user OK before push).
+- [x] GitHub repo + Pages for the privacy policy URL (public repo `smartdeal/translated-subtitles-for-youtube`).
 - [x] `npm run zip`; load the zip contents unpacked in Chrome and re-check golden path.
 - [ ] Upload (user: developer account, $5 fee, 2-step verification), fill dashboard from `docs/store/`, submit as Unlisted.
 

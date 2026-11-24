@@ -3,18 +3,19 @@
 Last updated: 2026-11-24
 
 ## Status
-M0 spike done (both risks resolved); M1 MVP next.
+M1 MVP done and checked in Chrome on `feat/m1-mvp`; M2 next.
 
 ## Current focus
-M1: MVP (caption source, translator, scheduler, overlay, player button).
+M2: popup settings + per-video cache.
 
 ## Next steps
-- M1: caption source module: parse json3 into cues; merge ASR word segments into lines/sentences (unit tests).
-- M1: `Translator` interface + Chrome built-in impl (isolated world).
-- M1: translate-ahead scheduler, overlay, player-bar toggle.
+- M2: popup settings (target language, display mode, font size) in `chrome.storage.sync`; `DEFAULT_SETTINGS` is the only place with language codes now.
+- M2: per-video translation cache in `chrome.storage.local`.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
+- 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.
 - 2026-11-24: M0 spike results (Chrome 157, logged-in account): Translator en->ru works in isolated content script; direct json3 caption fetch works without `pot`; player's own caption XHR is interceptable in MAIN world.
 - 2026-11-15: WXT 0.21.5 + TS 5.9.3 + Vitest 5.1.0 scaffold; spike scripts (isolated + MAIN world) build.
 - 2026-11-14: project files created after kickoff grilling.
@@ -31,4 +32,5 @@ M1: MVP (caption source, translator, scheduler, overlay, player button).
 
 ## Open questions / blockers
 - Direct caption fetch tested only on a logged-in Premium account; may need `pot` when logged out. Fallback (XHR intercept) is ready.
+- Error status for videos without English subtitles not yet seen in a real browser (code path only).
 - ASR json3 tracks are word-level segments with `"\n"` events: need grouping into readable lines.

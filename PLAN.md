@@ -5,12 +5,12 @@ Last updated: 2026-11-24
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M1
+Current milestone: M2
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
 | M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
-| M1 | MVP | todo | Captions in, translate, overlay, player button |
+| M1 | MVP | done | Captions in, translate, overlay, player button |
 | M2 | Settings + cache | todo | Popup settings; per-video cache |
 | M3 | Polish | todo | SPA navigation, errors, model download progress |
 
@@ -43,18 +43,20 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to AGENTS.md). Test clicks by element ref, not screenshot coordinates: YouTube layout shifts.
 
 ### M1: MVP
-- [ ] Caption source module (MAIN world: captionTracks + json3 fetch, XHR fallback; parse cues; merge ASR segments).
-- [ ] `Translator` interface + Chrome built-in impl.
-- [ ] Translate-ahead scheduler.
-- [ ] Overlay synced to playback (dual-line).
-- [ ] Player-bar toggle button.
+- [x] Caption source module (MAIN world: captionTracks + json3 fetch, XHR fallback; parse cues; merge ASR segments).
+- [x] `Translator` interface + Chrome built-in impl.
+- [x] Translate-ahead scheduler.
+- [x] Overlay synced to playback (dual-line).
+- [x] Player-bar toggle button.
+
+Retro: `git rm` of the last file in a dir deletes the dir; re-create before writing. Default branch is `master`.
 
 ### M2: Settings + cache
 - [ ] Popup: target language, display mode (dual / translation only), font size.
 - [ ] Per-video cache in `chrome.storage.local`.
 
 ### M3: Polish
-- [ ] Handle YouTube SPA navigation between videos.
+- [x] Handle YouTube SPA navigation between videos (restart on `yt-navigate-finish`, done in M1).
 - [ ] Error states: no captions, unsupported language pair, API unavailable.
 - [ ] Model download progress indicator.
 
@@ -71,4 +73,5 @@ Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to A
 
 ## Plan changes
 <!-- newest first, one line each: YYYY-MM-DD: what changed; why. Keep ~20, move older to docs/plan/changes-archive.md -->
+- 2026-11-24: SPA navigation moved from M3 into M1; without it old subtitles stayed on the next video.
 - 2026-11-14: plan created from kickoff grilling.

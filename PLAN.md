@@ -40,7 +40,7 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 - [x] Prove `Translator` (en->ru) works from the extension (content script, else main world/offscreen).
 - [x] Prove we can get the caption track of a `/watch` video (player's own response, else caption DOM).
 
-Retro: TBD
+Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to AGENTS.md). Test clicks by element ref, not screenshot coordinates: YouTube layout shifts.
 
 ### M1: MVP
 - [ ] Caption source module (MAIN world: captionTracks + json3 fetch, XHR fallback; parse cues; merge ASR segments).

@@ -9,6 +9,7 @@ import {
   type GetCaptionsRequest,
 } from './messages';
 import { Overlay } from './overlay';
+import { cacheKey, type TranslationCache } from './cache';
 import type { Settings } from './settings';
 import { TranslationQueue } from './translation-queue';
 import type { TextTranslator } from './translator';
@@ -40,15 +41,27 @@ export class Session {
   private raf = 0;
   private shown = '';
   private stopped = false;
+  private cacheKey = '';
+  private saveTimer = 0;
+  private dirty = false;
   private readonly onSeek = () => this.queue?.seek(this.video.currentTime * 1000);
 
   constructor(
     private readonly player: HTMLElement,
     private readonly video: HTMLVideoElement,
     private readonly translator: TextTranslator,
-    private readonly settings: Settings,
+    private settings: Settings,
+    private readonly cache?: TranslationCache,
   ) {
     this.overlay = new Overlay(player);
+    this.overlay.setScale(settings.fontScale);
+  }
+
+  /** Display settings apply live; a language change needs a new session. */
+  updateDisplay(settings: Settings): void {
+    this.settings = settings;
+    this.overlay.setScale(settings.fontScale);
+    this.shown = '';
   }
 
   async start(videoId: string): Promise<void> {
@@ -65,12 +78,19 @@ export class Session {
       this.overlay.setStatus(ERROR_TEXT['no-track']);
       return;
     }
+    this.cacheKey = cacheKey(videoId, this.settings.sourceLanguage, this.settings.targetLanguage);
+    const known = (await this.cache?.load(this.cacheKey).catch(() => ({}))) ?? {};
+    if (this.stopped) return;
     this.overlay.setStatus('');
     this.queue = new TranslationQueue(
       this.cues,
       this.translator,
-      () => (this.shown = ''), // force a redraw when a translation arrives
+      () => {
+        this.shown = ''; // force a redraw when a translation arrives
+        this.scheduleSave();
+      },
       (i, err) => console.warn('[TP] translation failed for cue', i, err),
+      known,
     );
     this.video.addEventListener('seeking', this.onSeek);
     this.onSeek();
@@ -91,7 +111,23 @@ export class Session {
     this.raf = requestAnimationFrame(this.tick);
   };
 
+  /** Write to storage at most every few seconds, not per line. */
+  private scheduleSave(): void {
+    this.dirty = true;
+    if (this.saveTimer) return;
+    this.saveTimer = window.setTimeout(() => this.flush(), 5000);
+  }
+
+  private flush(): void {
+    clearTimeout(this.saveTimer);
+    this.saveTimer = 0;
+    if (!this.dirty || !this.queue || !this.cache) return;
+    this.dirty = false;
+    void this.cache.save(this.cacheKey, this.queue.toMap()).catch((e) => console.warn('[TP] cache save failed', e));
+  }
+
   stop(): void {
+    this.flush();
     this.stopped = true;
     cancelAnimationFrame(this.raf);
     this.video.removeEventListener('seeking', this.onSeek);

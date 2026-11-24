@@ -16,8 +16,19 @@ export class TranslationQueue {
     private readonly translator: TextTranslator,
     private readonly onTranslated: (index: number) => void = () => {},
     private readonly onError: (index: number, err: unknown) => void = () => {},
+    known: Record<string, string> = {},
   ) {
-    this.translations = new Array(cues.length);
+    // Prefill from cache; Object.hasOwn avoids keys like "constructor".
+    this.translations = cues.map((c) => (Object.hasOwn(known, c.text) ? known[c.text] : undefined));
+  }
+
+  /** Finished translations as original -> translation (failed ones excluded). */
+  toMap(): Record<string, string> {
+    const map: Record<string, string> = {};
+    this.translations.forEach((t, i) => {
+      if (t) map[this.cues[i]!.text] = t;
+    });
+    return map;
   }
 
   /** Start or move the work to time `t` (ms). */

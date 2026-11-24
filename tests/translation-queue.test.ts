@@ -61,3 +61,20 @@ describe('TranslationQueue', () => {
     expect(order).toEqual(['t0', 't1']);
   });
 });
+
+describe('TranslationQueue cache', () => {
+  it('skips cues known from cache and exports finished translations', async () => {
+    const order: string[] = [];
+    const q = new TranslationQueue(cues, fakeTranslator(order, 't5'), undefined, undefined, { t1: 'cached1', t2: 'cached2' });
+    q.seek(0);
+    await settle(q);
+    expect(order).toEqual(['t0', 't3', 't4', 't5']);
+    expect(q.translations[1]).toBe('cached1');
+    expect(q.toMap()).toEqual({ t0: 'T0', t1: 'cached1', t2: 'cached2', t3: 'T3', t4: 'T4' });
+  });
+
+  it('ignores inherited object keys in the cache map', () => {
+    const q = new TranslationQueue([{ start: 0, end: 1, text: 'constructor' }], fakeTranslator([]));
+    expect(q.translations[0]).toBeUndefined();
+  });
+});

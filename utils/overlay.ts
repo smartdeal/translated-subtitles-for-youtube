@@ -4,8 +4,8 @@ const CSS = `
 .tp-overlay{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:60;max-width:80%;
   text-align:center;pointer-events:none;font-family:"YouTube Noto",Roboto,Arial,sans-serif;line-height:1.3}
 .tp-overlay>div{display:table;margin:2px auto;padding:2px 8px;background:rgba(8,8,8,.75);color:#fff;border-radius:3px;
-  font-size:clamp(14px,2.2vw,28px);white-space:pre-wrap}
-.tp-overlay .tp-orig{color:#ddd;font-size:clamp(12px,1.8vw,22px)}
+  font-size:calc(clamp(14px,2.2vw,28px)*var(--tp-scale,1));white-space:pre-wrap}
+.tp-overlay .tp-orig{color:#ddd;font-size:calc(clamp(12px,1.8vw,22px)*var(--tp-scale,1))}
 .tp-overlay .tp-status{font-size:14px;color:#ffd666}
 .tp-overlay>div:empty{display:none}
 .ytp-autohide .tp-overlay{bottom:6%}
@@ -34,6 +34,10 @@ export class Overlay {
   show(original: string, translation: string | undefined, showOriginal: boolean): void {
     this.orig.textContent = showOriginal || !translation ? original : '';
     this.tr.textContent = translation ?? (original ? '…' : '');
+  }
+
+  setScale(scale: number): void {
+    this.root.style.setProperty('--tp-scale', String(scale));
   }
 
   setStatus(text: string): void {

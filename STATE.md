@@ -3,7 +3,7 @@
 Last updated: 2026-11-24
 
 ## Status
-M1 MVP done and checked in Chrome on `feat/m1-mvp`; M2 next.
+M2 code written on `feat/m2-settings-cache`; unit tests pass; browser check pending.
 
 ## Current focus
 M2: popup settings + per-video cache.
@@ -14,6 +14,7 @@ M2: popup settings + per-video cache.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
 - 2026-11-24: M1 checked in Chrome: dual lines synced, native CC hidden, seek, SPA switch to another video, toggle off.
 - 2026-11-24: M1 MVP code: captions parse/merge, TranslationQueue, Chrome translator, overlay, player button, SPA restart. 10 unit tests.
 - 2026-11-24: M0 spike results (Chrome 157, logged-in account): Translator en->ru works in isolated content script; direct json3 caption fetch works without `pot`; player's own caption XHR is interceptable in MAIN world.
@@ -28,6 +29,8 @@ M2: popup settings + per-video cache.
 - TypeScript 5.9 (not 7.x): WXT peer range is >=5.4; TS 7 native compiler untested with WXT tooling.
 - Translator runs in the isolated content script: works there; first `create()` needs the click gesture (model download ~8.5 s once), later calls need none. ~40 ms per line sequential, ~13 s for a 315-line talk.
 - Caption source: MAIN-world script reads `captionTracks` from `#movie_player.getPlayerResponse()` and fetches `baseUrl&fmt=json3`; fallback: intercept player's own `/api/timedtext` XHR (it fires when CC is on). Pass cues to isolated world via `window.postMessage`.
+- Cache = map original line -> translation per video+language pair (survives line-split changes); saved at most every 5 s and on stop.
+- Language change in popup turns the button off: a new pair may need a model download, which needs a click.
 - MVP covers `youtube.com/watch` only: Shorts/live handle captions differently.
 
 ## Open questions / blockers

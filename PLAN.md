@@ -11,7 +11,7 @@ Current milestone: M2
 |----|-----------|--------|----------|
 | M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | done | Captions in, translate, overlay, player button |
-| M2 | Settings + cache | todo | Popup settings; per-video cache |
+| M2 | Settings + cache | in progress | Popup settings; per-video cache |
 | M3 | Polish | todo | SPA navigation, errors, model download progress |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.

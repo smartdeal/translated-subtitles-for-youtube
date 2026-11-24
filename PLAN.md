@@ -1,15 +1,15 @@
 # Project plan
 
-Last updated: 2026-11-14
+Last updated: 2026-11-24
 
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M0
+Current milestone: M1
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
-| M0 | Spike | todo | Scaffold; prove Translator API in extension and caption track access |
+| M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | todo | Captions in, translate, overlay, player button |
 | M2 | Settings + cache | todo | Popup settings; per-video cache |
 | M3 | Polish | todo | SPA navigation, errors, model download progress |
@@ -36,12 +36,14 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 ## Milestones
 <!-- status: [ ] todo, [~] in progress, [x] done -->
 ### M0: Spike
-- [ ] Scaffold WXT + TypeScript + Vitest; lint/typecheck; fill AGENTS.md Commands/Structure.
-- [ ] Prove `Translator` (en->ru) works from the extension (content script, else main world/offscreen).
-- [ ] Prove we can get the caption track of a `/watch` video (player's own response, else caption DOM).
+- [x] Scaffold WXT + TypeScript + Vitest; lint/typecheck; fill AGENTS.md Commands/Structure.
+- [x] Prove `Translator` (en->ru) works from the extension (content script, else main world/offscreen).
+- [x] Prove we can get the caption track of a `/watch` video (player's own response, else caption DOM).
+
+Retro: WXT treats every file in `entrypoints/` as an entrypoint (rule added to AGENTS.md). Test clicks by element ref, not screenshot coordinates: YouTube layout shifts.
 
 ### M1: MVP
-- [ ] Caption source module (parse cues).
+- [ ] Caption source module (MAIN world: captionTracks + json3 fetch, XHR fallback; parse cues; merge ASR segments).
 - [ ] `Translator` interface + Chrome built-in impl.
 - [ ] Translate-ahead scheduler.
 - [ ] Overlay synced to playback (dual-line).
@@ -57,8 +59,7 @@ A working daily tool: watch English YouTube videos with Russian subtitles (origi
 - [ ] Model download progress indicator.
 
 ## Risks / unknowns
-- Translator API may not be exposed to content scripts.
-- Caption URLs may need a proof-of-origin token; direct fetch may fail.
+- Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).
 - YouTube SPA and DOM changes break selectors.
 - Sequential translation is slow on long tracks.
 

@@ -13,14 +13,17 @@ Chrome extension (MV3) that shows translated subtitles on YouTube videos. Person
 - No backend.
 
 ## Commands
-- Install: TBD (set when WXT is scaffolded in M0)
-- Dev: TBD
-- Test: TBD
+- Install: `npm install`
+- Dev: `npm run dev` (opens a separate Chrome profile; for the user's own Chrome use build + load unpacked)
+- Test: `npm test` (Vitest)
+- Typecheck: `npm run typecheck`
 - Lint/format: TBD
-- Build/deploy: TBD (load unpacked from the build output)
+- Build: `npm run build` -> load unpacked `.output/chrome-mv3`, reload the extension after each build
 
 ## Structure
-TBD: set after scaffold.
+- `entrypoints/`: WXT entrypoints only (every file there is an entrypoint). `*.content.ts` = content scripts.
+- `utils/`: shared code imported by entrypoints.
+- `types/`: ambient types (e.g. Translator API).
 
 ## Conventions
 - Branch per task: `feat/<slug>`, `fix/<slug>`. Small commits, one logical change each.
@@ -29,8 +32,8 @@ TBD: set after scaffold.
 - Keep YouTube DOM selectors and caption-fetch logic in one module each; YouTube breaks them often.
 
 ## Definition of Done
-- Tests: TBD (command) pass; new behavior has tests; bugs get a failing test first.
-- Lint/typecheck: TBD (command) pass.
+- Tests: `npm test` pass; new behavior has tests; bugs get a failing test first.
+- Typecheck: `npm run typecheck` pass.
 - UI: checked in Chrome on a real YouTube video (golden path plus one edge case).
 - STATE.md and PLAN.md updated.
 - Committed on a task branch.

@@ -5,14 +5,14 @@ Last updated: 2026-11-24
 <!-- OVERVIEW: keep this block under ~30 lines. Agents read only this part first. -->
 ## Overview
 Goal: Chrome extension that shows translated (en->ru, any pair later) subtitles on YouTube.
-Current milestone: M3
+Current milestone: none (M0-M3 done; next from Ideas)
 
 | ID | Milestone | Status | One line |
 |----|-----------|--------|----------|
 | M0 | Spike | done | Scaffold; prove Translator API in extension and caption track access |
 | M1 | MVP | done | Captions in, translate, overlay, player button |
 | M2 | Settings + cache | done | Popup settings; per-video cache |
-| M3 | Polish | in progress | SPA navigation, errors, model download progress |
+| M3 | Polish | done | SPA navigation, errors, model download progress |
 
 Sections below: Goal, Scope, Architecture, Milestones (`### M<n>:`), Risks, Ideas, Plan changes.
 <!-- END OVERVIEW -->
@@ -59,8 +59,10 @@ Retro: extension popup and chrome:// pages are not reachable by browser automati
 
 ### M3: Polish
 - [x] Handle YouTube SPA navigation between videos (restart on `yt-navigate-finish`, done in M1).
-- [ ] Error states: no captions, unsupported language pair, API unavailable.
-- [ ] Model download progress indicator.
+- [x] Error states: no captions (lists available languages), unsupported/same pair, API unavailable, caption timeout, repeated translation failures.
+- [x] Model download progress indicator.
+
+Retro: TBD
 
 ## Risks / unknowns
 - Caption URLs may need a proof-of-origin token when logged out (direct fetch worked logged in; XHR intercept fallback proven).

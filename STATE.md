@@ -3,17 +3,17 @@
 Last updated: 2026-11-24
 
 ## Status
-M3 code on `feat/m3-polish`; unit tests pass; browser check pending.
+All planned milestones (M0-M3) done; M3 on `feat/m3-polish`, not merged. Daily use + pick next ideas.
 
 ## Current focus
-M3: polish (error states, model download progress).
+Use it daily; collect issues. Pick the next item from PLAN.md "Ideas / later".
 
 ## Next steps
-- M3: error states (no captions, unsupported pair, API unavailable): see one in a real browser.
-- M3: model download progress indicator (basic status line exists; polish it).
+- Choose next idea (e.g. DeepL/LLM engine, Shorts/live, Web Store release) and add it as M4 in PLAN.md.
 
 ## Recent changes
 <!-- newest first, keep ~10 -->
+- 2026-11-24: M3 checked in Chrome: "No English subtitles. This video has: Russian." shown and hidden after 8 s, button stays on; `en-US` ASR-only video translates.
 - 2026-11-24: M3 code: clear error texts (lists available caption languages), 10 s caption timeout, warning after 3 failed translations, same-language check. 21 unit tests.
 - 2026-11-24: M2 checked in Chrome: cache hit shows translation in 1 frame (uncached 150-1650 ms); popup checked by user (font, mode, language switch).
 - 2026-11-24: M2 code: popup (languages, display, font size) in `sync:settings`, LRU per-video cache (50 videos) in storage.local. 17 unit tests.
@@ -37,5 +37,5 @@ M3: polish (error states, model download progress).
 
 ## Open questions / blockers
 - Direct caption fetch tested only on a logged-in Premium account; may need `pot` when logged out. Fallback (XHR intercept) is ready.
-- Error status for videos without English subtitles not yet seen in a real browser (code path only).
+- Not seen in a real browser: 'timeout', 'fetch-failed', 'translation keeps failing', API missing (all code paths, unit-tested texts only). New download text "(one time only)" not re-seen; download progress itself was seen by user in M2.
 - ASR json3 tracks are word-level segments with `"\n"` events: need grouping into readable lines.
